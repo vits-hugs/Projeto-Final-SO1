@@ -13,6 +13,20 @@ public:
     void run();
 
     void draw_texture(unsigned int texture, int length, int height, float angle);
+    /**
+ * Tile defined as an enum where each type is defined as:
+ *      W: Wall
+ *      G: Ghost Pen Gate
+ *      P: Portal
+ *      u: Empty path
+ *      o: Pill
+ *      e: Eaten Pill
+ *      O: Big Pill
+ *      E: Eaten Big Pill
+ */
+
+    typedef enum {W, G, P, u, o, e, O, E, F} tile;
+    static tile maze[28][31];
 
 private:
     void load_and_bind_textures();

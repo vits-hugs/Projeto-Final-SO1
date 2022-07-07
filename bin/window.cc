@@ -1,22 +1,6 @@
 #include "window.h"
 
-
-/**
- * Tile defined as an enum where each type is defined as:
- *      W: Wall
- *      G: Ghost Pen Gate
- *      P: Portal
- *      u: Empty path
- *      o: Pill
- *      e: Eaten Pill
- *      O: Big Pill
- *      E: Eaten Big Pill
- */
-/*
-typedef enum {W, G, P, u, o, e, O, E, F} tile;
-
-// 2D array defines the size of the maze and also what each tile contains
-tile maze[28][31] =
+Window::tile Window::maze[28][31] =
         {
                 {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W},
                 {W,o,o,o,o,W,W,O,o,o,o,W,u,u,u,W,u,W,u,u,u,W,o,o,o,o,O,o,o,o,W},
@@ -47,7 +31,24 @@ tile maze[28][31] =
                 {W,o,o,o,o,W,W,O,o,o,o,W,u,u,u,W,u,W,u,u,u,W,o,o,o,o,O,o,o,o,W},
                 {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W}
         };
-*/
+
+
+/**
+ * Tile defined as an enum where each type is defined as:
+ *      W: Wall
+ *      G: Ghost Pen Gate
+ *      P: Portal
+ *      u: Empty path
+ *      o: Pill
+ *      e: Eaten Pill
+ *      O: Big Pill
+ *      E: Eaten Big Pill
+ */
+
+
+
+// 2D array defines the size of the maze and also what each tile contains
+
 
 Window::Window()
 {
@@ -97,8 +98,8 @@ void Window::run()
         window.draw(maze_sprite);
         pac_0_sprite.setPosition(220, 365);
         window.draw(pac_0_sprite);
-        ghost_r_0_sprite.setPosition(245, 150);
-        window.draw(ghost_r_0_sprite);
+        ghost_p_0_sprite.setPosition(245, 150);
+        window.draw(ghost_p_0_sprite);
         window.display();
     }
 }
