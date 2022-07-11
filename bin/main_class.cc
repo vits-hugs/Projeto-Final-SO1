@@ -2,7 +2,8 @@
 
 __BEGIN_API
 
-Thread *Main::ping_pong_threads[5];
+Thread *Main::ghost_threads[4];
+
 Semaphore *Main::sem;
 
 __END_API

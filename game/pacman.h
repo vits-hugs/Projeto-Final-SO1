@@ -1,6 +1,21 @@
+#ifndef pacman_h
+#define pacman_h
 
-int func() {
-    return 1240938490;
+class Pacman
+{
+public:
+    Pacman();
+
+    int damage();
+
+private:
+    int life{3};
 
 
-}
+};
+
+
+
+
+
+#endif
