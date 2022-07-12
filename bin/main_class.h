@@ -1,6 +1,7 @@
 #ifndef main_class_h
 #define main_class_h
 
+#include <SFML/Graphics.hpp>
 #include <iostream>
 #include "cpu.h"
 #include "traits.h"
@@ -40,7 +41,7 @@ public:
 
         // pacman_thread = new Thread(run_ghost,(char *) pang_name.data(),0);
         window_thread = new Thread(show_window);
-        // input_thread = new Thread(run_ghost,(char *) pang_name.data(),0);
+        input_thread = new Thread(Read_input);
 
         // Ghosts
         ghost_threads[0] = new Thread(run_ghost, (char *) pang_name.data(), 3);
@@ -57,6 +58,7 @@ public:
 
         int ec;
         ec = window_thread->join();
+        ec =  input_thread->join();
         std::cout << "main: esperando Pang...\n";
         ec = ghost_threads[0]->join();
         std::cout << "main: Pang acabou com exit code " << ec << "\n";
@@ -83,7 +85,7 @@ public:
         delete ghost_threads[3];
         
         //delete pacman_thread;
-        //delete input_thread;
+        delete input_thread;
         delete window_thread;
     }
 
@@ -113,12 +115,55 @@ private:
     }
     
     static void show_window() {
+        Window window_logic;
+        sf::RenderWindow window(sf::VideoMode(500, 500), "SFML works!");
+        window.setKeyRepeatEnabled(false);
+        while(window.isOpen()) {
+        sem->p();
 
-        Window window;
-        window.run();
+        window_logic.run(window);
+        Thread::yield();
+        sem->v();
+        }
+        
+       
+    }
+
+    static void Read_input() {
+    while(window.isOpen()) {
+         
+        sem->p();
+        sf::Event event;
+        while (window.pollEvent(event))
+        {
+            switch (event.type) {
+            case sf::Event::Closed:
+                    window.close();
+                    break;
+            
+            // key pressed
+            case sf::Event::KeyPressed:
+                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
+                    std::cout << "Keyboard esquerda!" << std::endl;
+                } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
+                    std::cout << "Keyboard direita!" << std::endl;
+                } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
+                    std::cout << "Keyboard para baixo!" << std::endl;
+                } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
+                    std::cout << "Keyboard para cima!" << std::endl;
+                } else
+                    std::cout << "Keyboard pressed = " << event.key.code << std::endl;
+                break;
+            
+            }
+            Thread::yield();
+            sem->v();
+        }
+    }
     }
 
     private:
+        static sf::RenderWindow window;
         static Thread *ghost_threads[4];
         static Thread *pacman_thread;
         static Thread *window_thread;
