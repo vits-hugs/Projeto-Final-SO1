@@ -6,6 +6,8 @@
 #include "traits.h"
 #include "thread.h"
 #include "semaphore.h"
+#include "window.h"
+#include "../game/pacman.h"
 
 __BEGIN_API
 
@@ -36,10 +38,15 @@ public:
         std::string pong_name = "               Pong";
         std::string pung_name = "                   Pung";
 
-        ghost_threads[0] = new Thread(run_ghost, (char *) pang_name.data(), 0);
-        ghost_threads[1] = new Thread(run_ghost, (char *) peng_name.data(), 1);
-        ghost_threads[2] = new Thread(run_ghost, (char *) ping_name.data(), 2);
-        ghost_threads[3] = new Thread(run_ghost, (char *) pong_name.data(), 3);
+        // pacman_thread = new Thread(run_ghost,(char *) pang_name.data(),0);
+        window_thread = new Thread(show_window);
+        // input_thread = new Thread(run_ghost,(char *) pang_name.data(),0);
+
+        // Ghosts
+        ghost_threads[0] = new Thread(run_ghost, (char *) pang_name.data(), 3);
+        ghost_threads[1] = new Thread(run_ghost, (char *) peng_name.data(), 4);
+        ghost_threads[2] = new Thread(run_ghost, (char *) ping_name.data(), 5);
+        ghost_threads[3] = new Thread(run_ghost, (char *) pong_name.data(), 6);
 
         sem = new Semaphore();
 
@@ -49,6 +56,7 @@ public:
         }
 
         int ec;
+        ec = window_thread->join();
         std::cout << "main: esperando Pang...\n";
         ec = ghost_threads[0]->join();
         std::cout << "main: Pang acabou com exit code " << ec << "\n";
@@ -74,6 +82,9 @@ public:
         delete ghost_threads[2];
         delete ghost_threads[3];
         
+        //delete pacman_thread;
+        //delete input_thread;
+        delete window_thread;
     }
 
     ~Main() {}
@@ -100,9 +111,18 @@ private:
         ghost_threads[id]->thread_exit(id);        
 
     }
+    
+    static void show_window() {
+
+        Window window;
+        window.run();
+    }
 
     private:
         static Thread *ghost_threads[4];
+        static Thread *pacman_thread;
+        static Thread *window_thread;
+        static Thread *input_thread;
         static Semaphore *sem;
 };
 

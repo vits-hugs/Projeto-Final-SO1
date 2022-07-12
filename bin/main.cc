@@ -1,5 +1,3 @@
-#include "window.h"
-#include "../game/pacman.h"
 #include "thread.h"
 #include "system.h"
 #include "main_class.h"
@@ -9,8 +7,8 @@
 __USING_API 
 int main(void)
 {
-    Window window;
-    window.run();
+    //Window window;
+    //window.run();
     /*for (size_t i = 0; i < 31; i++)
     {
         for (size_t j = 0; j < 28; j++)

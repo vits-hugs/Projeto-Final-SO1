@@ -34,3 +34,4 @@ main
 
 #Vscode config
 *.log
+.vscode/settings.json
