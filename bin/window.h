@@ -10,7 +10,7 @@ class Window
 public:
     Window();
 
-    void run(sf::RenderWindow& window);
+    void run(sf::RenderWindow* window);
 
     void draw_texture(unsigned int texture, int length, int height, float angle);
     /**

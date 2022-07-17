@@ -59,20 +59,20 @@ void Window::draw_texture(unsigned int texture, int length, int height, float an
 {
 }
 
-void Window::run(sf::RenderWindow& window)
+void Window::run(sf::RenderWindow* window)
 {
     
     //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
     //https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php
  
 
-    window.clear();
-    window.draw(maze_sprite);
+    window->clear();
+    window->draw(maze_sprite);
     pac_0_sprite.setPosition(220, 365);
-    window.draw(pac_0_sprite);
+    window->draw(pac_0_sprite);
     ghost_p_0_sprite.setPosition(245, 150);
-    window.draw(ghost_p_0_sprite);
-    window.display();
+    window->draw(ghost_p_0_sprite);
+    window->display();
 
     
 }

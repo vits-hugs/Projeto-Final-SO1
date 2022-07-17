@@ -39,6 +39,9 @@ public:
         std::string pong_name = "               Pong";
         std::string pung_name = "                   Pung";
 
+        sf::RenderWindow window_(sf::VideoMode(500, 500), "SFML works!");
+        window_.setKeyRepeatEnabled(false);
+        window = &window_;
         // pacman_thread = new Thread(run_ghost,(char *) pang_name.data(),0);
         window_thread = new Thread(show_window);
         input_thread = new Thread(Read_input);
@@ -96,7 +99,8 @@ private:
     static const int ITERATIONS = 10;
 
     static void run_ghost(char *name,int id) {
-             int i ;
+        while(window->isOpen()) { 
+        int i ;
 
         std::cout << name << ": inicio\n";
 
@@ -104,21 +108,19 @@ private:
         for (i = 0; i < ITERATIONS; i++)
         {
             std::cout << name << ": " << i << "\n" ;
-            Thread::yield();
+            //Thread::yield();
         }
         sem->v();
         std::cout << name << ": fim\n";
 
-
+        }
         ghost_threads[id]->thread_exit(id);        
-
+        
     }
     
     static void show_window() {
         Window window_logic;
-        sf::RenderWindow window(sf::VideoMode(500, 500), "SFML works!");
-        window.setKeyRepeatEnabled(false);
-        while(window.isOpen()) {
+        while(window->isOpen()) {
         sem->p();
 
         window_logic.run(window);
@@ -130,15 +132,17 @@ private:
     }
 
     static void Read_input() {
-    while(window.isOpen()) {
-         
+    db<Thread>(TRC) << "LENDO INPUT\n";
+    
+    while(window->isOpen()) {
+        
         sem->p();
         sf::Event event;
-        while (window.pollEvent(event))
+        while (window->pollEvent(event))
         {
             switch (event.type) {
             case sf::Event::Closed:
-                    window.close();
+                    window->close();
                     break;
             
             // key pressed
@@ -156,14 +160,14 @@ private:
                 break;
             
             }
-            Thread::yield();
+            //Thread::yield();
             sem->v();
         }
     }
     }
 
     private:
-        static sf::RenderWindow window;
+        static sf::RenderWindow* window;
         static Thread *ghost_threads[4];
         static Thread *pacman_thread;
         static Thread *window_thread;
