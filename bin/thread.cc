@@ -140,7 +140,7 @@ void Thread::yield(){
     }
     db<Semaphore>(TRC) << "rodando: " << prev->_state << "\n";
     _running = next;
-
+    db<Thread>(TRC) << "Y> thread next:" << next->id() << "\n";
     next->_state = RUNNING;
 
     switch_context(prev,next);

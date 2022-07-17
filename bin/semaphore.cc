@@ -27,11 +27,14 @@ void Semaphore::p() {
 void Semaphore::v() {
   
     db<Semaphore>(TRC) << "thread: " << Thread::running()->id() << " .v() \n";
+    db<Semaphore>(TRC) << "v -> _v = " << _v << "\n"; 
     if (CPU::finc(_v) < 1) {
         wakeup();
+    }   else {
+        db<Semaphore>(TRC) << "NOT WAKEUP\n";
+        Thread::yield();
     }
-
-    db<Semaphore>(TRC) << "v -> _v = " << _v << "\n"; 
+    //Thread::yield();
 }
 
 // Funções pra threads

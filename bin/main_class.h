@@ -99,20 +99,12 @@ private:
     static const int ITERATIONS = 10;
 
     static void run_ghost(char *name,int id) {
-        while(window->isOpen()) { 
-        int i ;
-
         std::cout << name << ": inicio\n";
-
+        while(window->isOpen()) { 
         sem->p();
-        for (i = 0; i < ITERATIONS; i++)
-        {
-            std::cout << name << ": " << i << "\n" ;
+            std::cout << name << "\n" ;
             //Thread::yield();
-        }
         sem->v();
-        std::cout << name << ": fim\n";
-
         }
         ghost_threads[id]->thread_exit(id);        
         
@@ -124,7 +116,7 @@ private:
         sem->p();
 
         window_logic.run(window);
-        Thread::yield();
+        //Thread::yield();
         sem->v();
         }
         
@@ -136,10 +128,10 @@ private:
     
     while(window->isOpen()) {
         
-        sem->p();
         sf::Event event;
         while (window->pollEvent(event))
         {
+            sem->p();
             switch (event.type) {
             case sf::Event::Closed:
                     window->close();
