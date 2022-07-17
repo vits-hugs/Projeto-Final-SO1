@@ -50,9 +50,11 @@ Window::tile Window::maze[28][31] =
 // 2D array defines the size of the maze and also what each tile contains
 
 
-Window::Window()
+Window::Window(Pacman* pacman)
 {
+    this->pacman = pacman; 
     load_and_bind_textures();
+
 }
 
 void Window::draw_texture(unsigned int texture, int length, int height, float angle)
@@ -68,7 +70,7 @@ void Window::run(sf::RenderWindow* window)
     std::cout << "Window RUN \n";
     window->clear();
     window->draw(maze_sprite);
-    pac_0_sprite.setPosition(220, 365);
+    pac_0_sprite.setPosition(pacman->x(), pacman->y());
     window->draw(pac_0_sprite);
     ghost_p_0_sprite.setPosition(245, 150);
     window->draw(ghost_p_0_sprite);

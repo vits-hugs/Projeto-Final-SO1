@@ -1,6 +1,8 @@
 #ifndef inputReader_h
 #define inputReader_h
 
+#include "pacman.h"
+
 class InputReader
 {
 public:
@@ -8,6 +10,8 @@ public:
 
     short int get_inputs();
 
+private:
+    Pacman* pacman;
 
 };
 

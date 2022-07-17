@@ -4,11 +4,11 @@
 #include <iostream>
 #include <png.h>
 #include <SFML/Graphics.hpp>
-
+#include "../game/pacman.h"
 class Window
 {
 public:
-    Window();
+    Window(Pacman* pacman);
 
     void run(sf::RenderWindow* window);
 
@@ -33,7 +33,8 @@ private:
 
 
 private:
-
+    Pacman * pacman;
+    //Ghost * ghost;
     // Maze Textures
     sf::Texture maze_tex;
     sf::Sprite maze_sprite;

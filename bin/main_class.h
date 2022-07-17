@@ -41,11 +41,13 @@ public:
 
         sf::RenderWindow window_(sf::VideoMode(500, 500), "SFML works!");
         window_.setKeyRepeatEnabled(false);
+        
         window = &window_;
+        pacman = new Pacman();
         // pacman_thread = new Thread(run_ghost,(char *) pang_name.data(),0);
         window_thread = new Thread(show_window);
         input_thread = new Thread(Read_input);
-
+        pacman_thread = new Thread(run_pacman);
         // Ghosts
         ghost_threads[0] = new Thread(run_ghost, (char *) pang_name.data(), 3);
         ghost_threads[1] = new Thread(run_ghost, (char *) peng_name.data(), 4);
@@ -62,6 +64,7 @@ public:
         int ec;
         ec = window_thread->join();
         ec =  input_thread->join();
+        ec = pacman_thread->join();
         std::cout << "main: esperando Pang...\n";
         ec = ghost_threads[0]->join();
         std::cout << "main: Pang acabou com exit code " << ec << "\n";
@@ -98,6 +101,19 @@ private:
 
     static const int ITERATIONS = 10;
 
+    static void run_pacman() {
+        while(window->isOpen()) { 
+            sem->p();
+            std::cout << "PACMAN RUN \n" ;
+            //Thread::yield();
+            pacman->move();
+            std::cout << pacman->x() << "\n";
+            sem->v();
+        }
+        pacman_thread->thread_exit(4);        
+
+    } 
+    
     static void run_ghost(char *name,int id) {
         std::cout << name << ": inicio\n";
         while(window->isOpen()) { 
@@ -111,7 +127,7 @@ private:
     }
     
     static void show_window() {
-        Window window_logic;
+        Window window_logic = Window(pacman);
         while(window->isOpen()) {
         sem->p();
 
@@ -119,7 +135,7 @@ private:
         //Thread::yield();
         sem->v();
         }
-        
+        window_thread->thread_exit(2);
        
     }
 
@@ -141,12 +157,16 @@ private:
             case sf::Event::KeyPressed:
                 if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
                     std::cout << "Keyboard esquerda!" << std::endl;
+                    pacman->setDirection(pacman->LEFT);
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
                     std::cout << "Keyboard direita!" << std::endl;
+                    pacman->setDirection(pacman->RIGHT);
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                     std::cout << "Keyboard para baixo!" << std::endl;
+                    pacman->setDirection(pacman->DOWN);
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                     std::cout << "Keyboard para cima!" << std::endl;
+                    pacman->setDirection(pacman->UP);
                 } else
                     std::cout << "Keyboard pressed = " << event.key.code << std::endl;
                 break;
@@ -155,11 +175,14 @@ private:
             //Thread::yield();
             sem->v();
         }
-    }
+        }
+        window_thread->thread_exit(2);
     }
 
     private:
         static sf::RenderWindow* window;
+        static Pacman* pacman;
+
         static Thread *ghost_threads[4];
         static Thread *pacman_thread;
         static Thread *window_thread;
