@@ -5,7 +5,10 @@ Pacman::Pacman() {
 }
 
 void Pacman::move() {
-    std::cout << "speed\n";
+    _old_x = _x;
+    _old_y = _y;
+    
+
     switch (direct)
     {
     case RIGHT:
@@ -27,5 +30,4 @@ void Pacman::move() {
 
         break;
     }
-
 }

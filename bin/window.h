@@ -15,6 +15,10 @@ public:
     void draw_texture(unsigned int texture, int length, int height, float angle);
 
     void draw_pacman();
+
+    void draw_board_testing();
+    
+
     /**
  * Tile defined as an enum where each type is defined as:
  *      W: Wall
@@ -29,12 +33,15 @@ public:
 
     typedef enum {W, G, P, u, o, e, O, E, F} tile;
     static tile maze[28][31];
-
+    float test_x,test_y;
 private:
+    bool verify_colision_with_tile(tile tile);
+    void pacman_collision();
     void draw_sprite(sf::Sprite& sprite, int length, int height, float angle);
+    void draw_objects_on_maze(); 
+    void draw_object(sf::Sprite& sprite, int x, int y);
     void load_and_bind_textures();
     void center_sprite_origin(sf::Sprite& sprite);
-
 private:
     unsigned int counter{0};
     sf::RenderWindow* window;

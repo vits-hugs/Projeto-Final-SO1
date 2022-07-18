@@ -45,6 +45,7 @@ public:
         
         window = &window_;
         pacman = new Pacman();
+        window_logic = new Window(window,pacman);
         // pacman_thread = new Thread(run_ghost,(char *) pang_name.data(),0);
         window_thread = new Thread(show_window);
         input_thread = new Thread(Read_input);
@@ -105,10 +106,9 @@ private:
     static void run_pacman() {
         while(window->isOpen()) { 
             sem->p();
-            std::cout << "PACMAN RUN \n" ;
             //Thread::yield();
             pacman->move();
-            std::cout << pacman->x() << "\n";
+            std::cout << "X: " << pacman->x() << " Y: " << pacman->y() << "\n";
             sem->v();
         }
         pacman_thread->thread_exit(4);        
@@ -128,13 +128,14 @@ private:
     }
     
     static void show_window() {
-        Window window_logic = Window(window,pacman);
         window->setFramerateLimit(FPS);
         while(window->isOpen()) {
         sem->p();
 
-        window_logic.run();
+        window_logic->run();
         //Thread::yield();
+        std::cout << "TAM_X: "<<window_logic->test_x << "\nTAM_Y: "
+        << window_logic->test_y << "\n";
         sem->v();
         }
         window_thread->thread_exit(2);
@@ -185,8 +186,9 @@ private:
     }
 
     private:
-        static sf::RenderWindow* window;
-        static Pacman* pacman;
+        static sf::RenderWindow *window;
+        static Window *window_logic;
+        static Pacman *pacman;
 
         static Thread *ghost_threads[4];
         static Thread *pacman_thread;
