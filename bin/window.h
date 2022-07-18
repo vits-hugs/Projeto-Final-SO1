@@ -16,6 +16,8 @@ public:
 
     void draw_pacman();
 
+    void draw_board_testing();
+    
     bool verify_colision();
 
     /**
@@ -32,7 +34,7 @@ public:
 
     typedef enum {W, G, P, u, o, e, O, E, F} tile;
     static tile maze[28][31];
-
+    float test_x,test_y;
 private:
     void draw_sprite(sf::Sprite& sprite, int length, int height, float angle);
     void load_and_bind_textures();

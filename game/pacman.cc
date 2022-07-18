@@ -5,31 +5,29 @@ Pacman::Pacman() {
 }
 
 void Pacman::move() {
-    if (!colide){
+    _old_x = _x;
+    _old_y = _y;
+    
 
-        switch (direct)
-        {
-        case RIGHT:
-            /* code */
-            _x += speed;
-            break;
-        case LEFT:
-            _x -= speed;
-            break;
-        case UP:
-            _y -= speed;
-            break;
-        
-        case DOWN:
-            _y += speed;
-            break;
-        default:
-            std::cout << "UEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n";
+    switch (direct)
+    {
+    case RIGHT:
+        /* code */
+        _x += speed;
+        break;
+    case LEFT:
+        _x -= speed;
+        break;
+    case UP:
+        _y -= speed;
+        break;
+    
+    case DOWN:
+        _y += speed;
+        break;
+    default:
+        std::cout << "UEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n";
 
-            break;
-        }
-
+        break;
     }
-    colide = false;
-
 }

@@ -134,6 +134,8 @@ private:
 
         window_logic->run();
         //Thread::yield();
+        std::cout << "TAM_X: "<<window_logic->test_x << "\nTAM_Y: "
+        << window_logic->test_y << "\n";
         sem->v();
         }
         window_thread->thread_exit(2);

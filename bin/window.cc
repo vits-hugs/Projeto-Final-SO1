@@ -2,10 +2,10 @@
 
 Window::tile Window::maze[28][31] =
         {
-                {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W},
+                          {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W},
                 {W,o,o,o,o,W,W,O,o,o,o,W,u,u,u,W,u,W,u,u,u,W,o,o,o,o,O,o,o,o,W},
-                {W,o,o,W,o,W,W,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
-                {W,o,o,W,o,o,o,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
+                {W,o,W,W,o,W,W,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
+                {W,o,W,W,o,o,o,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
                 {W,o,W,W,o,W,W,W,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
                 {W,o,W,W,o,W,W,W,W,W,o,W,W,W,W,W,u,W,W,W,W,W,o,W,W,o,W,W,W,o,W},
                 {W,o,W,W,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,W},
@@ -29,9 +29,10 @@ Window::tile Window::maze[28][31] =
                 {W,o,W,W,o,o,o,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
                 {W,o,W,W,o,W,W,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
                 {W,o,o,o,o,W,W,O,o,o,o,W,u,u,u,W,u,W,u,u,u,W,o,o,o,o,O,o,o,o,W},
-                {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W}
+                {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W}    
         };
 
+            
 
 /**
  * Tile defined as an enum where each type is defined as:
@@ -69,14 +70,13 @@ void Window::draw_sprite(sf::Sprite& sprite, int x, int y, float angle)
 }
 
 void Window::center_sprite_origin(sf::Sprite& sprite) {
-    sf::FloatRect rect= sprite.getGlobalBounds();
+    sf::FloatRect rect= sprite.getLocalBounds();
     sprite.setOrigin(sf::Vector2f(rect.width/2,rect.height/2));
+    test_x = rect.width;
+    test_y = rect.height;
 }
 
 void Window::draw_pacman() {
-    if (verify_colision()) {
-        pacman->colided();
-    }
     switch (counter%3)
     {
     case 0:
@@ -92,6 +92,11 @@ void Window::draw_pacman() {
     default:
         break;
     }
+    if (verify_colision()) {
+        pacman->return_old_pos();
+        ghost_scared_0_sprite.setPosition(pacman->x(),pacman->y());
+        window->draw(ghost_scared_0_sprite);
+    }
 }
 
 void Window::run()
@@ -103,6 +108,7 @@ void Window::run()
     std::cout << "Window RUN \n";
     window->clear();
     window->draw(maze_sprite);
+    draw_board_testing();
     draw_pacman();
     ghost_p_0_sprite.setPosition(245, 150);
     window->draw(ghost_p_0_sprite);
@@ -112,23 +118,52 @@ void Window::run()
 }
 
 bool Window::verify_colision() {
-    switch (pacman->get_direction())
+    int pacman_x = (int)pacman->x();
+    int pacman_y = (int)pacman->y();
+    center_sprite_origin(ghost_p_0_sprite);
+    /*switch (pacman->get_direction())
     {
     case Pacman::LEFT:
-        return (maze[(int)pacman->x()/16-1][(int)pacman->y()/16] == W);
+       ghost_p_0_sprite.setPosition(pacman->x()-16,pacman->y() );
+        window->draw(ghost_p_0_sprite);
+        return maze[pacman_x/16-1][pacman_y/16] == W;
     case Pacman::RIGHT:
-        return maze[(int)pacman->x()/16+1][(int)pacman->y()/16] == W;
+        ghost_p_0_sprite.setPosition(pacman->x()+16,pacman->y());
+        window->draw(ghost_p_0_sprite);
+        return maze[pacman_x/16+1][pacman_y/16] == W;
     case Pacman::UP:
-        return maze[(int)pacman->x()/16][(int)pacman->y()/16-1] == W;
+        ghost_p_0_sprite.setPosition(pacman->x(),pacman->y()-16);
+        window->draw(ghost_p_0_sprite);
+        return maze[pacman_x/16][pacman_y/16-1] == W;
     case Pacman::DOWN:
-        return maze[(int)pacman->x()/16][(int)pacman->y()/16+1] == W;
+       ghost_p_0_sprite.setPosition(pacman->x(),pacman->y()+16 );
+        window->draw(ghost_p_0_sprite);
+        return maze[pacman_x/16][pacman_y/16+1] == W;
         
     
     default:
         break;
     }
+    */
+    return maze[pacman_x/16][pacman_y/16] == W;;
+}
 
-    return true;
+void Window::draw_board_testing() {
+    
+    for (int x = 0; x < 28; x++)
+    {
+        for (int y = 0; y < 31; y++)
+        {
+            if(maze[x][y]==W){
+            ghost_r_0_sprite.setPosition(x*16,y*16);
+            window->draw(ghost_r_0_sprite);
+            }
+        }
+        
+    }
+    
+
+
 }
 
 void Window::load_and_bind_textures()
@@ -138,7 +173,10 @@ void Window::load_and_bind_textures()
     // Bind map textures    
     maze_tex.loadFromFile("sprites/maze/maze.png");
     maze_sprite.setTexture(maze_tex);
-    maze_sprite.scale(2, 2);
+    center_sprite_origin(maze_sprite);
+    maze_sprite.scale(2,-2);
+    maze_sprite.setPosition(16*14,16*15.5);//REFATORAR
+    //maze_sprite.setRotation(180);
     pill_tex.loadFromFile("sprites/maze/p-0.png");
     pill_sprite.setTexture(pill_tex);
     bigPill_tex.loadFromFile("sprites/maze/p-1.png");
