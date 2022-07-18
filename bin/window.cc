@@ -69,6 +69,7 @@ void Window::draw_sprite(sf::Sprite& sprite, int x, int y, float angle)
     window->draw(sprite);
 }
 
+
 void Window::center_sprite_origin(sf::Sprite& sprite) {
     sf::FloatRect rect= sprite.getLocalBounds();
     sprite.setOrigin(sf::Vector2f(rect.width/2,rect.height/2));
@@ -77,6 +78,7 @@ void Window::center_sprite_origin(sf::Sprite& sprite) {
 }
 
 void Window::draw_pacman() {
+    //pacman_collision();
     switch (counter%3)
     {
     case 0:
@@ -92,11 +94,13 @@ void Window::draw_pacman() {
     default:
         break;
     }
-    if (verify_colision()) {
+    if (verify_colision_with_tile(W)) {
+     
         pacman->return_old_pos();
         ghost_scared_0_sprite.setPosition(pacman->x(),pacman->y());
         window->draw(ghost_scared_0_sprite);
     }
+    
 }
 
 void Window::run()
@@ -108,7 +112,8 @@ void Window::run()
     std::cout << "Window RUN \n";
     window->clear();
     window->draw(maze_sprite);
-    draw_board_testing();
+    draw_objects_on_maze();
+    //draw_board_testing();
     draw_pacman();
     ghost_p_0_sprite.setPosition(245, 150);
     window->draw(ghost_p_0_sprite);
@@ -117,35 +122,60 @@ void Window::run()
     counter++;
 }
 
-bool Window::verify_colision() {
+bool Window::verify_colision_with_tile(Window::tile tile) {
     int pacman_x = (int)pacman->x();
     int pacman_y = (int)pacman->y();
-    center_sprite_origin(ghost_p_0_sprite);
-    /*switch (pacman->get_direction())
-    {
-    case Pacman::LEFT:
-       ghost_p_0_sprite.setPosition(pacman->x()-16,pacman->y() );
-        window->draw(ghost_p_0_sprite);
-        return maze[pacman_x/16-1][pacman_y/16] == W;
-    case Pacman::RIGHT:
-        ghost_p_0_sprite.setPosition(pacman->x()+16,pacman->y());
-        window->draw(ghost_p_0_sprite);
-        return maze[pacman_x/16+1][pacman_y/16] == W;
-    case Pacman::UP:
-        ghost_p_0_sprite.setPosition(pacman->x(),pacman->y()-16);
-        window->draw(ghost_p_0_sprite);
-        return maze[pacman_x/16][pacman_y/16-1] == W;
-    case Pacman::DOWN:
-       ghost_p_0_sprite.setPosition(pacman->x(),pacman->y()+16 );
-        window->draw(ghost_p_0_sprite);
-        return maze[pacman_x/16][pacman_y/16+1] == W;
-        
+    return maze[pacman_x/16][pacman_y/16] == tile;
+}
+
+void Window::pacman_collision() {
+    int pacman_maze_x = (int)pacman->x()/16;
+    int pacman_maze_y = (int)pacman->y()/16;
     
+    switch (maze[pacman_maze_x][pacman_maze_y])
+    {
+    case W:
+        pacman->return_old_pos();
+        ghost_scared_0_sprite.setPosition(pacman->x(),pacman->y());
+        window->draw(ghost_scared_0_sprite);
+    case o:
+        maze[pacman_maze_x][pacman_maze_y] = e;
+        break;
+    case O:
+        maze[pacman_maze_x][pacman_maze_y] = E;
     default:
         break;
     }
-    */
-    return maze[pacman_x/16][pacman_y/16] == W;;
+
+}
+void Window::draw_object(sf::Sprite& sprite,int x,int y) {
+        sprite.setPosition(x*16,y*16);
+        window->draw(sprite);
+}
+
+
+void Window::draw_objects_on_maze() {
+    
+    for (int x = 0; x < 28; x++)
+    {
+        for (int y = 0; y < 31; y++)
+        {
+           switch (maze[x][y])
+           {
+            case o:
+                draw_object(pill_sprite,x,y);
+                break;
+            case O:
+                draw_object(bigPill_sprite,x,y);
+                break;
+           default:
+            break;
+           }
+        }
+    }
+        
+    
+
 }
 
 void Window::draw_board_testing() {
