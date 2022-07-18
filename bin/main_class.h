@@ -107,7 +107,7 @@ private:
         while(window->isOpen()) { 
             sem->p();
             //Thread::yield();
-            pacman->move();
+            pacman->run();
             std::cout << "X: " << pacman->x() << " Y: " << pacman->y() << "\n";
             sem->v();
         }

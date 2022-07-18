@@ -1,10 +1,12 @@
 #include "pacman.h"
 #include <iostream>
 Pacman::Pacman() {
-
+    _x = INIT_POS_X;
+    _y = INIT_POS_Y;
+    speed = PAC_SPEED;
 }
 
-void Pacman::move() {
+void Pacman::run() {
     _old_x = _x;
     _old_y = _y;
     
