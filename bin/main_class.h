@@ -10,6 +10,7 @@
 #include "window.h"
 #include "../game/pacman.h"
 
+#define FPS 30
 __BEGIN_API
 
 class Main
@@ -127,11 +128,12 @@ private:
     }
     
     static void show_window() {
-        Window window_logic = Window(pacman);
+        Window window_logic = Window(window,pacman);
+        window->setFramerateLimit(FPS);
         while(window->isOpen()) {
         sem->p();
 
-        window_logic.run(window);
+        window_logic.run();
         //Thread::yield();
         sem->v();
         }
@@ -145,9 +147,10 @@ private:
     while(window->isOpen()) {
         
         sf::Event event;
-        while (window->pollEvent(event))
+        
+        sem->p(); 
+        if (window->pollEvent(event))
         {
-            sem->p();
             switch (event.type) {
             case sf::Event::Closed:
                     window->close();
@@ -157,22 +160,24 @@ private:
             case sf::Event::KeyPressed:
                 if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
                     std::cout << "Keyboard esquerda!" << std::endl;
-                    pacman->setDirection(pacman->LEFT);
+                    pacman->set_direction(pacman->LEFT);
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
                     std::cout << "Keyboard direita!" << std::endl;
-                    pacman->setDirection(pacman->RIGHT);
+                    pacman->set_direction(pacman->RIGHT);
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
                     std::cout << "Keyboard para baixo!" << std::endl;
-                    pacman->setDirection(pacman->DOWN);
+                    pacman->set_direction(pacman->DOWN);
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                     std::cout << "Keyboard para cima!" << std::endl;
-                    pacman->setDirection(pacman->UP);
+                    pacman->set_direction(pacman->UP);
                 } else
                     std::cout << "Keyboard pressed = " << event.key.code << std::endl;
                 break;
             
             }
             //Thread::yield();
+            sem->v();
+        } else {
             sem->v();
         }
         }

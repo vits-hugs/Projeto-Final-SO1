@@ -50,18 +50,47 @@ Window::tile Window::maze[28][31] =
 // 2D array defines the size of the maze and also what each tile contains
 
 
-Window::Window(Pacman* pacman)
+Window::Window(sf::RenderWindow* window,Pacman* pacman)
 {
     this->pacman = pacman; 
+    this->window = window;
     load_and_bind_textures();
 
 }
 
-void Window::draw_texture(unsigned int texture, int length, int height, float angle)
+void Window::draw_sprite(sf::Sprite& sprite, int x, int y, float angle)
 {
+    center_sprite_origin(sprite);
+    sprite.setPosition(x,y);
+    sprite.setRotation(angle);
+
+    window->draw(sprite);
 }
 
-void Window::run(sf::RenderWindow* window)
+void Window::center_sprite_origin(sf::Sprite& sprite) {
+    sf::FloatRect rect= sprite.getGlobalBounds();
+    sprite.setOrigin(sf::Vector2f(rect.width/2,rect.height/2));
+}
+
+void Window::draw_pacman() {
+    switch (counter%3)
+    {
+    case 0:
+        draw_sprite(pac_0_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
+        break;
+    case 1:
+        draw_sprite(pac_1_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
+        break;
+    case 2:
+        draw_sprite(pac_2_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
+        break;
+    
+    default:
+        break;
+    }
+}
+
+void Window::run()
 {
     
     //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
@@ -70,17 +99,18 @@ void Window::run(sf::RenderWindow* window)
     std::cout << "Window RUN \n";
     window->clear();
     window->draw(maze_sprite);
-    pac_0_sprite.setPosition(pacman->x(), pacman->y());
-    window->draw(pac_0_sprite);
+    draw_pacman();
     ghost_p_0_sprite.setPosition(245, 150);
     window->draw(ghost_p_0_sprite);
     window->display();
 
-    
+    counter++;
 }
 
 void Window::load_and_bind_textures()
 {
+    unsigned int counter{0};
+    sf::RenderWindow* window;
     // Bind map textures    
     maze_tex.loadFromFile("sprites/maze/maze.png");
     maze_sprite.setTexture(maze_tex);

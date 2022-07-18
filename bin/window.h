@@ -8,11 +8,13 @@
 class Window
 {
 public:
-    Window(Pacman* pacman);
+    Window(sf::RenderWindow* window,Pacman* pacman);
 
-    void run(sf::RenderWindow* window);
+    void run();
 
     void draw_texture(unsigned int texture, int length, int height, float angle);
+
+    void draw_pacman();
     /**
  * Tile defined as an enum where each type is defined as:
  *      W: Wall
@@ -29,10 +31,13 @@ public:
     static tile maze[28][31];
 
 private:
+    void draw_sprite(sf::Sprite& sprite, int length, int height, float angle);
     void load_and_bind_textures();
-
+    void center_sprite_origin(sf::Sprite& sprite);
 
 private:
+    unsigned int counter{0};
+    sf::RenderWindow* window;
     Pacman * pacman;
     //Ghost * ghost;
     // Maze Textures

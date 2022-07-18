@@ -5,7 +5,7 @@ Pacman::Pacman() {
 }
 
 void Pacman::move() {
-
+    std::cout << "speed\n";
     switch (direct)
     {
     case RIGHT:
