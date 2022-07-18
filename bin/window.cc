@@ -4,8 +4,8 @@ Window::tile Window::maze[28][31] =
         {
                 {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W},
                 {W,o,o,o,o,W,W,O,o,o,o,W,u,u,u,W,u,W,u,u,u,W,o,o,o,o,O,o,o,o,W},
-                {W,o,W,W,o,W,W,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
-                {W,o,W,W,o,o,o,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
+                {W,o,o,W,o,W,W,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
+                {W,o,o,W,o,o,o,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
                 {W,o,W,W,o,W,W,W,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
                 {W,o,W,W,o,W,W,W,W,W,o,W,W,W,W,W,u,W,W,W,W,W,o,W,W,o,W,W,W,o,W},
                 {W,o,W,W,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,o,W},
@@ -60,6 +60,7 @@ Window::Window(sf::RenderWindow* window,Pacman* pacman)
 
 void Window::draw_sprite(sf::Sprite& sprite, int x, int y, float angle)
 {
+
     center_sprite_origin(sprite);
     sprite.setPosition(x,y);
     sprite.setRotation(angle);
@@ -73,6 +74,9 @@ void Window::center_sprite_origin(sf::Sprite& sprite) {
 }
 
 void Window::draw_pacman() {
+    if (verify_colision()) {
+        pacman->colided();
+    }
     switch (counter%3)
     {
     case 0:
@@ -105,6 +109,26 @@ void Window::run()
     window->display();
 
     counter++;
+}
+
+bool Window::verify_colision() {
+    switch (pacman->get_direction())
+    {
+    case Pacman::LEFT:
+        return (maze[(int)pacman->x()/16-1][(int)pacman->y()/16] == W);
+    case Pacman::RIGHT:
+        return maze[(int)pacman->x()/16+1][(int)pacman->y()/16] == W;
+    case Pacman::UP:
+        return maze[(int)pacman->x()/16][(int)pacman->y()/16-1] == W;
+    case Pacman::DOWN:
+        return maze[(int)pacman->x()/16][(int)pacman->y()/16+1] == W;
+        
+    
+    default:
+        break;
+    }
+
+    return true;
 }
 
 void Window::load_and_bind_textures()

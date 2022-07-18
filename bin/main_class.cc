@@ -10,4 +10,5 @@ Semaphore *Main::sem;
 
 sf::RenderWindow* Main::window;
 Pacman *Main::pacman;
+Window *Main::window_logic;
 __END_API

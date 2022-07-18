@@ -16,11 +16,13 @@ public:
     float x() {return _x;}
     float y() {return _y;}
 
+    void colided(){colide = true;}
 private:
     int life{3};
     float _x{INIT_POS_X};
     float _y{INIT_POS_Y};
     float speed{2};
+    bool colide;
     direction direct{LEFT};
 };
 
