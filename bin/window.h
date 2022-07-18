@@ -37,7 +37,7 @@ public:
     float test_x,test_y;
 private:
     bool verify_colision_with_tile(tile tile);
-    void pacman_collision();
+    void agent_collision(Agent* agent);
     void draw_sprite(sf::Sprite& sprite, int length, int height);
     void draw_sprite_and_rotate(sf::Sprite& sprite, int length, int height, float angle);
     void draw_objects_on_maze(); 

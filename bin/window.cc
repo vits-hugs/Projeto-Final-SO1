@@ -87,6 +87,7 @@ void Window::run()
 }
 
 void Window::draw_sprite(sf::Sprite& sprite, int x, int y) {
+    center_sprite_origin(sprite);
     sprite.setPosition(x,y);
     window->draw(sprite);
 }
@@ -123,13 +124,13 @@ void Window::draw_pacman() {
     default:
         break;
     }
-    if (verify_colision_with_tile(W)) {
-     
-        pacman->return_old_pos();
-        ghost_scared_0_sprite.setPosition(pacman->x(),pacman->y());
-        window->draw(ghost_scared_0_sprite);
-    }
-    pacman_collision();
+    //if (verify_colision_with_tile(W)) {
+    // 
+    //    pacman->return_old_pos();
+    //    ghost_scared_0_sprite.setPosition(pacman->x(),pacman->y());
+    //     window->draw(ghost_scared_0_sprite);
+    //}
+    agent_collision(pacman);
 }
 
 
@@ -139,22 +140,20 @@ bool Window::verify_colision_with_tile(Window::tile tile) {
     return maze[pacman_x/16][pacman_y/16] == tile;
 }
 
-void Window::pacman_collision() {
-    int pacman_maze_x = (int)pacman->x()/16;
-    int pacman_maze_y = (int)pacman->y()/16;
+void Window::agent_collision(Agent* agent) {
+    int agent_maze_x = (int)agent->x()/16;
+    int agent_maze_y = (int)agent->y()/16;
     
-    switch (maze[pacman_maze_x][pacman_maze_y])
+    switch (maze[agent_maze_x][agent_maze_y])
     {
-    /*case W:
-        pacman->return_old_pos();
-        ghost_scared_0_sprite.setPosition(pacman->x(),pacman->y());
-        window->draw(ghost_scared_0_sprite);
-    */
+    case W:
+        agent->return_to_old_pos();     
+        break;   
     case o:
-        maze[pacman_maze_x][pacman_maze_y] = e;
+        maze[agent_maze_x][agent_maze_y] = e;
         break;
     case O:
-        maze[pacman_maze_x][pacman_maze_y] = E;
+        maze[agent_maze_x][agent_maze_y] = E;
     default:
         break;
     }
@@ -215,13 +214,15 @@ void Window::draw_ghost(int ghost_id) {
     switch (ghost_id)
     {
     case 1:
-        draw_sprite(ghost_r_0_sprite,ghost->x(),ghost->y());
+        if (counter%2==0) {draw_sprite(ghost_r_0_sprite,ghost->x(),ghost->y());}
+        else {draw_sprite(ghost_r_1_sprite,ghost->x(),ghost->y());}
         break;
     
     default:
         break;
     }
 
+    agent_collision(ghost);
 }
 void Window::draw_all_ghosts() {
     for (int i = 0; i < 4; i++)

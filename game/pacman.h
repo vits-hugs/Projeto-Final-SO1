@@ -7,19 +7,16 @@
 class Pacman : public Agent
 {
 public:
-    typedef enum {LEFT,UP,RIGHT,DOWN} direction;
     Pacman();
+    typedef enum {LEFT,UP,RIGHT,DOWN} direction;
+    const int get_direction(){return direct;}
+    void set_direction(direction dir){direct = dir;}
 
     int damage();
     void run();
-    void set_direction(direction dir){direct = dir;}
-    const int get_direction(){return direct;}
-
-    void return_old_pos(){_x = _old_x; _y = _old_y;}
+    
 private:
     int life{3};
-    float _old_x{INIT_POS_X};
-    float _old_y{INIT_POS_Y};
     bool colide;
     direction direct{LEFT};
 };
