@@ -5,10 +5,11 @@
 #include <png.h>
 #include <SFML/Graphics.hpp>
 #include "../game/pacman.h"
+#include "../game/ghost.h"
 class Window
 {
 public:
-    Window(sf::RenderWindow* window,Pacman* pacman);
+    Window(sf::RenderWindow* window,Pacman* pacman,Ghost* ghost_array[]);
 
     void run();
 
@@ -37,15 +38,22 @@ public:
 private:
     bool verify_colision_with_tile(tile tile);
     void pacman_collision();
-    void draw_sprite(sf::Sprite& sprite, int length, int height, float angle);
+    void draw_sprite(sf::Sprite& sprite, int length, int height);
+    void draw_sprite_and_rotate(sf::Sprite& sprite, int length, int height, float angle);
     void draw_objects_on_maze(); 
     void draw_object(sf::Sprite& sprite, int x, int y);
     void load_and_bind_textures();
     void center_sprite_origin(sf::Sprite& sprite);
+
+    //GHOSTS
+    void draw_all_ghosts();
+    void draw_ghost(int ghost_id);
 private:
     unsigned int counter{0};
-    sf::RenderWindow* window;
-    Pacman * pacman;
+    sf::RenderWindow *window;
+    Pacman *pacman;
+    Ghost *ghost_array[4];
+    sf::Sprite pacman_sprites[3];
     //Ghost * ghost;
     // Maze Textures
     sf::Texture maze_tex;

@@ -9,7 +9,7 @@
 #include "semaphore.h"
 #include "window.h"
 #include "../game/pacman.h"
-
+#include "../game/ghost.h"
 #define FPS 30
 __BEGIN_API
 
@@ -45,16 +45,25 @@ public:
         
         window = &window_;
         pacman = new Pacman();
-        window_logic = new Window(window,pacman);
+
+        for (int i = 0; i < 4; i++)
+        {
+            ghost_array[i]= new Ghost(i);
+            /* code */
+        }
+        window_logic = new Window(window,pacman,ghost_array);
+        
+
+
         // pacman_thread = new Thread(run_ghost,(char *) pang_name.data(),0);
         window_thread = new Thread(show_window);
         input_thread = new Thread(Read_input);
         pacman_thread = new Thread(run_pacman);
         // Ghosts
-        ghost_threads[0] = new Thread(run_ghost, (char *) pang_name.data(), 3);
-        ghost_threads[1] = new Thread(run_ghost, (char *) peng_name.data(), 4);
-        ghost_threads[2] = new Thread(run_ghost, (char *) ping_name.data(), 5);
-        ghost_threads[3] = new Thread(run_ghost, (char *) pong_name.data(), 6);
+        ghost_threads[0] = new Thread(run_ghost, (char *) pang_name.data(), 0);
+        ghost_threads[1] = new Thread(run_ghost, (char *) peng_name.data(), 1);
+        ghost_threads[2] = new Thread(run_ghost, (char *) ping_name.data(), 2);
+        ghost_threads[3] = new Thread(run_ghost, (char *) pong_name.data(), 3);
 
         sem = new Semaphore();
 
@@ -119,7 +128,8 @@ private:
         std::cout << name << ": inicio\n";
         while(window->isOpen()) { 
         sem->p();
-            std::cout << name << "\n" ;
+        std::cout << name << "\n" ;
+        ghost_array[id]->run();
             //Thread::yield();
         sem->v();
         }
@@ -189,7 +199,7 @@ private:
         static sf::RenderWindow *window;
         static Window *window_logic;
         static Pacman *pacman;
-
+        static Ghost  *ghost_array[4];
         static Thread *ghost_threads[4];
         static Thread *pacman_thread;
         static Thread *window_thread;

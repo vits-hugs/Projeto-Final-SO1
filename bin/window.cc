@@ -51,22 +51,51 @@ Window::tile Window::maze[28][31] =
 // 2D array defines the size of the maze and also what each tile contains
 
 
-Window::Window(sf::RenderWindow* window,Pacman* pacman)
+Window::Window(sf::RenderWindow* window,Pacman* pacman,Ghost* ghost_array[])
 {
     this->pacman = pacman; 
     this->window = window;
+   // std::cout << "GHOST_ARRAY:" << ghost_array;
+   //this->ghost_array[0] = ghost_array;
+    for (size_t i = 0; i < 4; i++)
+    {
+        this->ghost_array[i] = ghost_array[i];
+    }
+    
     load_and_bind_textures();
-
+    sf::Sprite pacman_sprites[3]={pac_0_sprite,pac_1_sprite,pac_2_sprite};
 }
 
-void Window::draw_sprite(sf::Sprite& sprite, int x, int y, float angle)
+void Window::run()
 {
+    
+    //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
+    //https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php
+ 
+    std::cout << "Window RUN \n";
+    window->clear();
+    window->draw(maze_sprite);
+    draw_objects_on_maze();
+    //draw_board_testing();
+    draw_pacman();
+    draw_all_ghosts();
+    ghost_p_0_sprite.setPosition(245, 150);
+    window->draw(ghost_p_0_sprite);
+    window->display();
 
-    center_sprite_origin(sprite);
+    counter++;
+}
+
+void Window::draw_sprite(sf::Sprite& sprite, int x, int y) {
     sprite.setPosition(x,y);
-    sprite.setRotation(angle);
-
     window->draw(sprite);
+}
+
+void Window::draw_sprite_and_rotate(sf::Sprite& sprite, int x, int y, float angle)
+{
+    center_sprite_origin(sprite);
+    sprite.setRotation(angle);
+    draw_sprite(sprite,x,y);
 }
 
 
@@ -82,13 +111,13 @@ void Window::draw_pacman() {
     switch (counter%3)
     {
     case 0:
-        draw_sprite(pac_0_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
+        draw_sprite_and_rotate(pac_0_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
         break;
     case 1:
-        draw_sprite(pac_1_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
+        draw_sprite_and_rotate(pac_1_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
         break;
     case 2:
-        draw_sprite(pac_2_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
+        draw_sprite_and_rotate(pac_2_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
         break;
     
     default:
@@ -103,24 +132,6 @@ void Window::draw_pacman() {
     pacman_collision();
 }
 
-void Window::run()
-{
-    
-    //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
-    //https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php
- 
-    std::cout << "Window RUN \n";
-    window->clear();
-    window->draw(maze_sprite);
-    draw_objects_on_maze();
-    //draw_board_testing();
-    draw_pacman();
-    ghost_p_0_sprite.setPosition(245, 150);
-    window->draw(ghost_p_0_sprite);
-    window->display();
-
-    counter++;
-}
 
 bool Window::verify_colision_with_tile(Window::tile tile) {
     int pacman_x = (int)pacman->x();
@@ -196,6 +207,32 @@ void Window::draw_board_testing() {
 
 
 }
+//GHOSTS
+
+void Window::draw_ghost(int ghost_id) {
+    auto ghost = ghost_array[ghost_id];
+    std::cout << ghost;
+    switch (ghost_id)
+    {
+    case 1:
+        draw_sprite(ghost_r_0_sprite,ghost->x(),ghost->y());
+        break;
+    
+    default:
+        break;
+    }
+
+}
+void Window::draw_all_ghosts() {
+    for (int i = 0; i < 4; i++)
+    {
+        draw_ghost(i);
+    }
+
+
+
+}
+
 
 void Window::load_and_bind_textures()
 {

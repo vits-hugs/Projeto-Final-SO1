@@ -11,4 +11,5 @@ Semaphore *Main::sem;
 sf::RenderWindow* Main::window;
 Pacman *Main::pacman;
 Window *Main::window_logic;
+Ghost  *Main::ghost_array[4];
 __END_API
