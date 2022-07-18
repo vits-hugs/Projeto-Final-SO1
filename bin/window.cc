@@ -100,7 +100,7 @@ void Window::draw_pacman() {
         ghost_scared_0_sprite.setPosition(pacman->x(),pacman->y());
         window->draw(ghost_scared_0_sprite);
     }
-    
+    pacman_collision();
 }
 
 void Window::run()
@@ -134,10 +134,11 @@ void Window::pacman_collision() {
     
     switch (maze[pacman_maze_x][pacman_maze_y])
     {
-    case W:
+    /*case W:
         pacman->return_old_pos();
         ghost_scared_0_sprite.setPosition(pacman->x(),pacman->y());
         window->draw(ghost_scared_0_sprite);
+    */
     case o:
         maze[pacman_maze_x][pacman_maze_y] = e;
         break;
