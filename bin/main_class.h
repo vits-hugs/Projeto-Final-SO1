@@ -140,10 +140,11 @@ private:
     
     static void show_window() {
         window->setFramerateLimit(FPS);
+        sf::Clock clock;
         while(window->isOpen()) {
         sem->p();
 
-        window_logic->run();
+        window_logic->run(clock);
         //Thread::yield();
         //std::cout << "TAM_X: "<<window_logic->test_x << "\nTAM_Y: "
         //<< window_logic->test_y << "\n";

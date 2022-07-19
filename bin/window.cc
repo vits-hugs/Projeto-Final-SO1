@@ -68,7 +68,7 @@ Window::Window(sf::RenderWindow* window,Pacman* pacman,Ghost* ghost_array[])
     sf::Sprite pacman_sprites[3]={pac_0_sprite,pac_1_sprite,pac_2_sprite};
 }
 
-void Window::run()
+void Window::run(sf::Clock& clock)
 {
     
     //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
@@ -83,7 +83,7 @@ void Window::run()
     draw_all_ghosts();
     window->display();
 
-    counter++;
+    counter = (int)clock.getElapsedTime().asMilliseconds();
 }
 
 void Window::draw_sprite(sf::Sprite& sprite, int x, int y) {
@@ -145,11 +145,16 @@ sf::Vector2i Window::get_pos_matriz(Agent* agent) {
 }
 
 void Window::pacman_collision() {
+    pacman->verify_super(counter);
     sf::Vector2i agent_maze = get_pos_matriz(pacman);
     for(auto ghost:ghost_array){
 
         if(agent_maze.x==ghost->tile_old_x() && agent_maze.y==ghost->tile_old_y()) {
+            if(pacman->is_super()) {
+                ghost->kill(counter,rand()%7+1);
+            } else {
             if (!pacman->damage(counter,FPS)) lose();
+            }
         }
 
     }
@@ -168,6 +173,7 @@ void Window::pacman_collision() {
         maze[agent_maze.x][agent_maze.y] = E;
         pill_counter--;
         verify_win();
+        pacman->go_power(counter);
         break;
     case P:
         pacman->teleport();
@@ -239,29 +245,47 @@ void Window::draw_board_testing() {
 
 void Window::draw_ghost(int ghost_id) {
     auto ghost = ghost_array[ghost_id];
-    switch (ghost_id)
-    {
-    case 0:
-        if (counter%2==0) {draw_sprite(ghost_r_0_sprite,ghost->x(),ghost->y());}
-        else {draw_sprite(ghost_r_1_sprite,ghost->x(),ghost->y());}
-        break;
+    ghost->try_ressurection(counter);
+    if(pacman->is_super()){
+        switch (counter%3)
+        {
+        case 0:
+            draw_sprite(ghost_scared_0_sprite,ghost->x(),ghost->y());
+            break;
+        case 1:
+            draw_sprite(ghost_scared_1_sprite,ghost->x(),ghost->y());
+            break;
+        case 2:
+            draw_sprite(ghost_scared_2_sprite,ghost->x(),ghost->y());
+            break;
+        default:
+            break;
+        }
+    
+    } else {
+        switch (ghost_id)
+        {
+        case 0:
+            if (counter%2==0) {draw_sprite(ghost_r_0_sprite,ghost->x(),ghost->y());}
+            else {draw_sprite(ghost_r_1_sprite,ghost->x(),ghost->y());}
+            break;
 
-    case 1:
-        if (counter%2==0) {draw_sprite(ghost_p_0_sprite,ghost->x(),ghost->y());}
-        else {draw_sprite(ghost_p_1_sprite,ghost->x(),ghost->y());}
-        break;
-    case 2:
-        if (counter%2==0) {draw_sprite(ghost_y_0_sprite,ghost->x(),ghost->y());}
-        else {draw_sprite(ghost_y_1_sprite,ghost->x(),ghost->y());}
-        break;
-    case 3:
-         if (counter%2==0) {draw_sprite(ghost_b_0_sprite,ghost->x(),ghost->y());}
-        else {draw_sprite(ghost_b_1_sprite,ghost->x(),ghost->y());}
-        break;
-    default:
-        break;
+        case 1:
+            if (counter%2==0) {draw_sprite(ghost_p_0_sprite,ghost->x(),ghost->y());}
+            else {draw_sprite(ghost_p_1_sprite,ghost->x(),ghost->y());}
+            break;
+        case 2:
+            if (counter%2==0) {draw_sprite(ghost_y_0_sprite,ghost->x(),ghost->y());}
+            else {draw_sprite(ghost_y_1_sprite,ghost->x(),ghost->y());}
+            break;
+        case 3:
+            if (counter%2==0) {draw_sprite(ghost_b_0_sprite,ghost->x(),ghost->y());}
+            else {draw_sprite(ghost_b_1_sprite,ghost->x(),ghost->y());}
+            break;
+        default:
+            break;
+        }
     }
-
     inform_ghost(ghost);
     agent_collision(ghost);
 }

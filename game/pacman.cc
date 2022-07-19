@@ -8,6 +8,13 @@ Pacman::Pacman() {
     speed = PAC_SPEED;
 }
 
+bool Pacman::verify_super(int time) {
+    if((time - time_power)/1000 >= SUPER_DURATION){
+        power=false;
+    }
+    return power;
+}   
+
 int Pacman::damage(int time,int fps) {
     if(time - last_time_damaged>3*fps) {
         life-=1;

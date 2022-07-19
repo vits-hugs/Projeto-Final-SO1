@@ -10,7 +10,7 @@ class Window
 public:
     Window(sf::RenderWindow* window,Pacman* pacman,Ghost* ghost_array[]);
 
-    void run();
+    void run(sf::Clock& clock);
 
     void draw_texture(unsigned int texture, int length, int height, float angle);
 
@@ -54,7 +54,7 @@ private:
     void draw_ghost(int ghost_id);
     void inform_ghost(Ghost* ghost);
 private:
-    unsigned int counter{0};
+    int counter;
     unsigned int pill_counter;
     sf::RenderWindow *window;
     Pacman *pacman;
