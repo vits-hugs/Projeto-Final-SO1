@@ -129,9 +129,9 @@ private:
         std::cout << name << ": inicio\n";
         while(window->isOpen()) { 
         sem->p();
-        //std::cout << name << "\n" ;
+
         ghost_array[id]->run();
-            //Thread::yield();
+ 
         sem->v();
         }
         ghost_threads[id]->thread_exit(id);        
@@ -141,13 +141,12 @@ private:
     static void show_window() {
         window->setFramerateLimit(FPS);
         sf::Clock clock;
+        for(Ghost* ghost:ghost_array) {
+            ghost->kill(clock.getElapsedTime().asSeconds(),rand()%7+1);
+        }
         while(window->isOpen()) {
         sem->p();
-
         window_logic->run(clock);
-        //Thread::yield();
-        //std::cout << "TAM_X: "<<window_logic->test_x << "\nTAM_Y: "
-        //<< window_logic->test_y << "\n";
         sem->v();
         }
         window_thread->thread_exit(2);

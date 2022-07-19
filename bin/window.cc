@@ -57,8 +57,7 @@ Window::Window(sf::RenderWindow* window,Pacman* pacman,Ghost* ghost_array[])
     this->pacman = pacman; 
     this->window = window;
     pill_counter = PILL_NUMBER;
-   // std::cout << "GHOST_ARRAY:" << ghost_array;
-   //this->ghost_array[0] = ghost_array;
+  
     for (size_t i = 0; i < 4; i++)
     {
         this->ghost_array[i] = ghost_array[i];
@@ -188,7 +187,6 @@ void Window::pacman_collision() {
         pacman->go_power(counter);
         break;
     case C:
-        std::cout << "bati Numa cereja\n";
         maze[agent_maze.x][agent_maze.y] = e;
         increase_score("100");
         break;
@@ -363,7 +361,7 @@ void Window::inform_ghost(Ghost *ghost) {
 
 void Window::verify_win() {
     if(!pill_counter) {
-        std::cout << "WINNNNNNNNN\n";
+        std::cout << "WIN\n";
         draw_sprite(score_1600_sprite,window->getSize().x/2-5,window->getSize().y/2);
         window->display();
         sf::Event event;
@@ -377,7 +375,7 @@ void Window::verify_win() {
 }
 
 void Window::lose() {
-    std::cout << "LOSEEEEE\n";
+    std::cout << "LOSE\n";
     draw_sprite(gameover_sprite, window->getSize().x/2-65, window->getSize().y/2);
     window->display();
     sf::Event event;
@@ -420,14 +418,6 @@ void Window::increase_score(const char* points) {
     if(soma<10) {
         num[index]=soma;
     }
-     std::cout << "num: ";
-    for (int x:num)
-    {
-        std::cout << x << ", "; 
-    }
-    
-    std::cout << std::endl;
-
 }
 
 void Window::load_and_bind_textures()
