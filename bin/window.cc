@@ -1,5 +1,6 @@
 #include "window.h"
-
+#define PILL_NUMBER 244
+#define FPS 20
 Window::tile Window::maze[28][31] =
         {
                 {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W},
@@ -55,6 +56,7 @@ Window::Window(sf::RenderWindow* window,Pacman* pacman,Ghost* ghost_array[])
 {
     this->pacman = pacman; 
     this->window = window;
+    pill_counter = PILL_NUMBER;
    // std::cout << "GHOST_ARRAY:" << ghost_array;
    //this->ghost_array[0] = ghost_array;
     for (size_t i = 0; i < 4; i++)
@@ -142,15 +144,12 @@ sf::Vector2i Window::get_pos_matriz(Agent* agent) {
     return sf::Vector2i((int)agent->x()/16,(int)agent->y()/16);
 }
 
-sf::Vector2i Window::get_pos_matriz_m(Agent* agent) {
-    return sf::Vector2i((int)(agent->x()-3)/16,(int)(agent->y()+3)/16);
-}
-
 void Window::pacman_collision() {
     sf::Vector2i agent_maze = get_pos_matriz(pacman);
     for(auto ghost:ghost_array){
+
         if(agent_maze.x==ghost->tile_old_x() && agent_maze.y==ghost->tile_old_y()) {
-            pacman->damage();
+            if (!pacman->damage(counter,FPS)) lose();
         }
 
     }
@@ -162,9 +161,17 @@ void Window::pacman_collision() {
     case o:
         maze[agent_maze.x][agent_maze.y] = e;
         draw_sprite(score_sprite,agent_maze.x,agent_maze.y);
+        pill_counter--;
+        verify_win();
         break;
     case O:
         maze[agent_maze.x][agent_maze.y] = E;
+        pill_counter--;
+        verify_win();
+        break;
+    case P:
+        pacman->teleport();
+        break;  
     default:
         break;
     }
@@ -178,6 +185,7 @@ void Window::agent_collision(Agent* agent) {
         agent->return_to_old_pos();     
         break;   
     case P:
+        agent->teleport();
         //maze[agent_maze.x][agent_maze.y] = e;
         break;
     }
@@ -190,7 +198,6 @@ void Window::draw_object(sf::Sprite& sprite,int x,int y) {
 
 
 void Window::draw_objects_on_maze() {
-    
     for (int x = 0; x < 28; x++)
     {
         for (int y = 0; y < 31; y++)
@@ -209,8 +216,6 @@ void Window::draw_objects_on_maze() {
         }
     }
         
-    
-
 }
 
 void Window::draw_board_testing() {
@@ -299,6 +304,35 @@ void Window::inform_ghost(Ghost *ghost) {
     Ghost::send_pac_cord(pacman->x(),pacman->y());
 }
 
+void Window::verify_win() {
+    if(!pill_counter) {
+        std::cout << "WINNNNNNNNN\n";
+        draw_sprite(score_1600_sprite,window->getSize().x/2-5,window->getSize().y/2);
+        window->display();
+        sf::Event event;
+        while(window->waitEvent(event)) {
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
+                break;
+            }
+        }
+    }
+
+}
+
+void Window::lose() {
+    std::cout << "LOSEEEEE\n";
+    draw_sprite(gameover_sprite, window->getSize().x/2-65, window->getSize().y/2);
+    window->display();
+    sf::Event event;
+    while(window->waitEvent(event)) {
+        if(event.type == sf::Event::Closed) window->close();
+        if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) break;
+                
+     
+    }
+    
+
+}
 
 void Window::load_and_bind_textures()
 {

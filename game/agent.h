@@ -9,6 +9,14 @@ class Agent {
         void set_old_pos(){_old_x=_x;_old_y=_y;}
         const float x(){return _x;}
         const float y(){return _y;}
+        void teleport(){
+            if(_x/16 > 2){
+                _x = 17;
+            } else {
+                _x = 16*26;
+            }
+        }
+
 
     protected:
         float _old_x;

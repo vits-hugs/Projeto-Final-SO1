@@ -1,6 +1,5 @@
 #ifndef window_h
 #define window_h
-
 #include <iostream>
 #include <png.h>
 #include <SFML/Graphics.hpp>
@@ -36,6 +35,8 @@ public:
     static tile maze[28][31];
     float test_x,test_y;
 private:
+    void verify_win();
+    void lose();
     bool verify_colision_with_tile(tile tile);
     void agent_collision(Agent* agent);
     void pacman_collision();
@@ -54,6 +55,7 @@ private:
     void inform_ghost(Ghost* ghost);
 private:
     unsigned int counter{0};
+    unsigned int pill_counter;
     sf::RenderWindow *window;
     Pacman *pacman;
     Ghost *ghost_array[4];

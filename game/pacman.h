@@ -14,12 +14,13 @@ public:
     const int get_direction(){return direct;}
     void set_direction(direction dir){direct = dir;}
 
-    int damage();
+    int damage(int time,int fps);
     void run();
     
 private:
     int life{3};
     bool colide;
+    int last_time_damaged;
     direction direct{LEFT};
 };
 

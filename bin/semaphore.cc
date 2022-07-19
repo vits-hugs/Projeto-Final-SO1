@@ -9,6 +9,7 @@ Semaphore::Semaphore(int d) {
 
 Semaphore::~Semaphore() {
     db<Semaphore>(TRC) << "morri \n";
+    wakeup_all();
 }
 
 // Implementar como se fosse um mutex primeiro

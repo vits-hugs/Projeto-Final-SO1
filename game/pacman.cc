@@ -8,11 +8,15 @@ Pacman::Pacman() {
     speed = PAC_SPEED;
 }
 
-int Pacman::damage() {
-    life-=1;
-    _x = INIT_POS_X;
-    _y = INIT_POS_Y;
-    set_old_pos();
+int Pacman::damage(int time,int fps) {
+    if(time - last_time_damaged>3*fps) {
+        life-=1;
+        _x = INIT_POS_X;
+        _y = INIT_POS_Y;
+        set_old_pos();
+        last_time_damaged = time;
+    }
+    return life;
 }
 
 void Pacman::run() {
