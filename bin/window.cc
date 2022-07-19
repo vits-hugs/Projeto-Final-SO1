@@ -66,6 +66,16 @@ Window::Window(sf::RenderWindow* window,Pacman* pacman,Ghost* ghost_array[])
     
     load_and_bind_textures();
     sf::Sprite pacman_sprites[3]={pac_0_sprite,pac_1_sprite,pac_2_sprite};
+    number_sprites[0] = num_0_sprite;
+    number_sprites[1] = num_1_sprite;
+    number_sprites[2] = num_2_sprite;
+    number_sprites[3] = num_3_sprite;
+    number_sprites[4] = num_4_sprite;
+    number_sprites[5] = num_5_sprite;
+    number_sprites[6] = num_6_sprite;
+    number_sprites[7] = num_7_sprite;
+    number_sprites[8] = num_8_sprite;
+    number_sprites[9] = num_9_sprite;
 }
 
 void Window::run(sf::Clock& clock)
@@ -81,6 +91,7 @@ void Window::run(sf::Clock& clock)
     //draw_board_testing();
     draw_pacman();
     draw_all_ghosts();
+    draw_score();
     window->display();
 
     counter = (int)clock.getElapsedTime().asMilliseconds();
@@ -152,6 +163,7 @@ void Window::pacman_collision() {
         if(agent_maze.x==ghost->tile_old_x() && agent_maze.y==ghost->tile_old_y()) {
             if(pacman->is_super()) {
                 ghost->kill(counter,rand()%7+1);
+                increase_score("200");
             } else {
             if (!pacman->damage(counter,FPS)) lose();
             }
@@ -165,13 +177,14 @@ void Window::pacman_collision() {
         break;   
     case o:
         maze[agent_maze.x][agent_maze.y] = e;
-        draw_sprite(score_sprite,agent_maze.x,agent_maze.y);
         pill_counter--;
+        increase_score("10");
         verify_win();
         break;
     case O:
         maze[agent_maze.x][agent_maze.y] = E;
         pill_counter--;
+        increase_score("10");
         verify_win();
         pacman->go_power(counter);
         break;
@@ -355,6 +368,45 @@ void Window::lose() {
      
     }
     
+
+}
+
+void Window::draw_score() {
+    draw_sprite(score_sprite,0,0);
+    for (int i = 0; i < 8; i++)
+    {
+        draw_sprite(number_sprites[num[7-i]],48+i*16,0);
+    }
+    
+
+}
+
+void Window::increase_score(const char* points) {
+    int index = -2;
+    for (size_t i = 0; i < 5; i++)
+    {
+        index++;
+        if(points[i]=='\0'){
+            break;
+        }
+    }
+    int soma = num[index]+points[0]-'0';
+    
+    while (soma>=10) {
+        num[index]=soma-9;
+        index++;
+        soma = num[index]+1;
+    }
+    if(soma<10) {
+        num[index]=soma;
+    }
+     std::cout << "num: ";
+    for (int x:num)
+    {
+        std::cout << x << ", "; 
+    }
+    
+    std::cout << std::endl;
 
 }
 

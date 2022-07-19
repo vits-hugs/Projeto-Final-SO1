@@ -51,15 +51,20 @@ private:
 
     //GHOSTS
     void draw_all_ghosts();
+    void draw_score();
+    void increase_score(const char* points);
     void draw_ghost(int ghost_id);
     void inform_ghost(Ghost* ghost);
 private:
     int counter;
+    int score{0};
     unsigned int pill_counter;
     sf::RenderWindow *window;
     Pacman *pacman;
     Ghost *ghost_array[4];
     sf::Sprite pacman_sprites[3];
+    sf::Sprite number_sprites[10];
+    int num[8];
     //Ghost * ghost;
     // Maze Textures
     sf::Texture maze_tex;
