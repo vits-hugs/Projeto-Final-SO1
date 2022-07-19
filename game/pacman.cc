@@ -8,6 +8,13 @@ Pacman::Pacman() {
     speed = PAC_SPEED;
 }
 
+int Pacman::damage() {
+    life-=1;
+    _x = INIT_POS_X;
+    _y = INIT_POS_Y;
+    set_old_pos();
+}
+
 void Pacman::run() {
     set_old_pos();
     

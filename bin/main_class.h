@@ -156,10 +156,10 @@ private:
     static void Read_input() {
     db<Thread>(TRC) << "LENDO INPUT\n";
     
+    bool pause = false;
     while(window->isOpen()) {
         
         sf::Event event;
-        
         sem->p(); 
         if (window->pollEvent(event))
         {
@@ -182,12 +182,22 @@ private:
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                     std::cout << "Keyboard para cima!" << std::endl;
                     pacman->set_direction(pacman->UP);
-                } else
-                    std::cout << "Keyboard pressed = " << event.key.code << std::endl;
+                } else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Q)) {
+                    window->close();
+                } else if(event.type == sf::Event::KeyPressed && event.key.code == (sf::Keyboard::P)) {
+                    std::cout << "PAUSE";
+                    pause = true;
+                    while(pause){
+                        window->waitEvent(event);
+                        if (event.type == sf::Event::KeyPressed && event.key.code == (sf::Keyboard::P)){
+                            pause = false;
+                        }
+                                
+                    }
+                 
+                }
                 break;
-            
             }
-            //Thread::yield();
             sem->v();
         } else {
             sem->v();

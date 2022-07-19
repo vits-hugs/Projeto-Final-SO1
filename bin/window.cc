@@ -76,11 +76,9 @@ void Window::run()
     window->clear();
     window->draw(maze_sprite);
     draw_objects_on_maze();
-    draw_board_testing();
+    //draw_board_testing();
     draw_pacman();
     draw_all_ghosts();
-    ghost_p_0_sprite.setPosition(245, 150);
-    window->draw(ghost_p_0_sprite);
     window->display();
 
     counter++;
@@ -108,7 +106,7 @@ void Window::center_sprite_origin(sf::Sprite& sprite) {
 }
 
 void Window::draw_pacman() {
-    //pacman_collision();
+    pacman_collision();
     switch (counter%3)
     {
     case 0:
@@ -130,7 +128,7 @@ void Window::draw_pacman() {
     //    ghost_scared_0_sprite.setPosition(pacman->x(),pacman->y());
     //     window->draw(ghost_scared_0_sprite);
     //}
-    agent_collision(pacman);
+    //agent_collision(pacman);
 }
 
 
@@ -148,6 +146,30 @@ sf::Vector2i Window::get_pos_matriz_m(Agent* agent) {
     return sf::Vector2i((int)(agent->x()-3)/16,(int)(agent->y()+3)/16);
 }
 
+void Window::pacman_collision() {
+    sf::Vector2i agent_maze = get_pos_matriz(pacman);
+    for(auto ghost:ghost_array){
+        if(agent_maze.x==ghost->tile_old_x() && agent_maze.y==ghost->tile_old_y()) {
+            pacman->damage();
+        }
+
+    }
+    switch (maze[agent_maze.x][agent_maze.y])
+    {
+    case W:
+        pacman->return_to_old_pos();     
+        break;   
+    case o:
+        maze[agent_maze.x][agent_maze.y] = e;
+        draw_sprite(score_sprite,agent_maze.x,agent_maze.y);
+        break;
+    case O:
+        maze[agent_maze.x][agent_maze.y] = E;
+    default:
+        break;
+    }
+}
+
 void Window::agent_collision(Agent* agent) {
     sf::Vector2i agent_maze = get_pos_matriz(agent);
     switch (maze[agent_maze.x][agent_maze.y])
@@ -155,12 +177,8 @@ void Window::agent_collision(Agent* agent) {
     case W:
         agent->return_to_old_pos();     
         break;   
-    case o:
-        maze[agent_maze.x][agent_maze.y] = e;
-        break;
-    case O:
-        maze[agent_maze.x][agent_maze.y] = E;
-    default:
+    case P:
+        //maze[agent_maze.x][agent_maze.y] = e;
         break;
     }
 
@@ -218,11 +236,23 @@ void Window::draw_ghost(int ghost_id) {
     auto ghost = ghost_array[ghost_id];
     switch (ghost_id)
     {
-    case 1:
+    case 0:
         if (counter%2==0) {draw_sprite(ghost_r_0_sprite,ghost->x(),ghost->y());}
         else {draw_sprite(ghost_r_1_sprite,ghost->x(),ghost->y());}
         break;
-    
+
+    case 1:
+        if (counter%2==0) {draw_sprite(ghost_p_0_sprite,ghost->x(),ghost->y());}
+        else {draw_sprite(ghost_p_1_sprite,ghost->x(),ghost->y());}
+        break;
+    case 2:
+        if (counter%2==0) {draw_sprite(ghost_y_0_sprite,ghost->x(),ghost->y());}
+        else {draw_sprite(ghost_y_1_sprite,ghost->x(),ghost->y());}
+        break;
+    case 3:
+         if (counter%2==0) {draw_sprite(ghost_b_0_sprite,ghost->x(),ghost->y());}
+        else {draw_sprite(ghost_b_1_sprite,ghost->x(),ghost->y());}
+        break;
     default:
         break;
     }
@@ -251,19 +281,18 @@ void Window::inform_ghost(Ghost *ghost) {
     }
     if(maze[ghost_pos.x-1][ghost_pos.y] != W  && (ghost->get_direction()!=Agent::RIGHT)){
         ghost->possibles[0] = true; 
-        draw_sprite(ghost_y_0_sprite,ghost->x()-16,ghost->y());
     } 
     if(maze[ghost_pos.x][ghost_pos.y+1] != W && (ghost->get_direction()!=Agent::UP)) {
         ghost->possibles[3] = true; 
-        draw_sprite(ghost_y_0_sprite,ghost->x(),ghost->y()+16);
+        
     }
     if(maze[ghost_pos.x][ghost_pos.y-1] != W && (ghost->get_direction()!=Agent::DOWN)) {
         ghost->possibles[1] = true; 
-        draw_sprite(ghost_y_0_sprite,ghost->x(),ghost->y()-16);
+        
     }
     if(maze[ghost_pos.x+1][ghost_pos.y] != W && (ghost->get_direction()!=Agent::LEFT)){
         ghost->possibles[2] = true;
-        draw_sprite(ghost_y_0_sprite,ghost->x()+16,ghost->y());
+        
     }
     }
     

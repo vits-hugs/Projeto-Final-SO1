@@ -19,8 +19,12 @@ short int InputReader::get_inputs() {
                     std::cout << "Keyboard para baixo!" << std::endl;
                 } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
                     std::cout << "Keyboard para cima!" << std::endl;
-                } else
+                } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::P)) {
+                    std::cout << "PAUSE";
+                } else {
                     std::cout << "Keyboard pressed = " << event.key.code << std::endl;
+                    
+                }
                 break;
             
             }
