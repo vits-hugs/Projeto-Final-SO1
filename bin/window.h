@@ -38,6 +38,7 @@ public:
 private:
     bool verify_colision_with_tile(tile tile);
     void agent_collision(Agent* agent);
+    sf::Vector2i get_pos_matriz(Agent* agent);
     void draw_sprite(sf::Sprite& sprite, int length, int height);
     void draw_sprite_and_rotate(sf::Sprite& sprite, int length, int height, float angle);
     void draw_objects_on_maze(); 
@@ -48,6 +49,7 @@ private:
     //GHOSTS
     void draw_all_ghosts();
     void draw_ghost(int ghost_id);
+    void inform_ghost(Ghost* ghost);
 private:
     unsigned int counter{0};
     sf::RenderWindow *window;

@@ -140,20 +140,22 @@ bool Window::verify_colision_with_tile(Window::tile tile) {
     return maze[pacman_x/16][pacman_y/16] == tile;
 }
 
+sf::Vector2i Window::get_pos_matriz(Agent* agent) {
+    return sf::Vector2i((int)agent->x()/16,(int)agent->y()/16);
+}
+
 void Window::agent_collision(Agent* agent) {
-    int agent_maze_x = (int)agent->x()/16;
-    int agent_maze_y = (int)agent->y()/16;
-    
-    switch (maze[agent_maze_x][agent_maze_y])
+    sf::Vector2i agent_maze = get_pos_matriz(agent);
+    switch (maze[agent_maze.x][agent_maze.y])
     {
     case W:
         agent->return_to_old_pos();     
         break;   
     case o:
-        maze[agent_maze_x][agent_maze_y] = e;
+        maze[agent_maze.x][agent_maze.y] = e;
         break;
     case O:
-        maze[agent_maze_x][agent_maze_y] = E;
+        maze[agent_maze.x][agent_maze.y] = E;
     default:
         break;
     }
@@ -210,6 +212,8 @@ void Window::draw_board_testing() {
 
 void Window::draw_ghost(int ghost_id) {
     auto ghost = ghost_array[ghost_id];
+    center_sprite_origin(ghost_r_0_sprite);
+    center_sprite_origin(ghost_r_1_sprite);
     std::cout << ghost;
     switch (ghost_id)
     {
@@ -222,8 +226,10 @@ void Window::draw_ghost(int ghost_id) {
         break;
     }
 
+    inform_ghost(ghost);
     agent_collision(ghost);
 }
+
 void Window::draw_all_ghosts() {
     for (int i = 0; i < 4; i++)
     {
@@ -231,6 +237,28 @@ void Window::draw_all_ghosts() {
     }
 
 
+
+}
+
+void Window::inform_ghost(Ghost *ghost) {
+    //ghost->center_me(ghost_pos.x,ghost_pos.y);
+    sf::Vector2i ghost_pos = get_pos_matriz(ghost);
+    for(bool& x:ghost->possibles) {
+        x = false;
+    }
+    if(maze[ghost_pos.x+1][ghost_pos.y] != W){
+        ghost->possibles[2] = true;
+    }
+    if(maze[ghost_pos.x-1][ghost_pos.y] != W){
+        ghost->possibles[0] = true; 
+    }
+    if(maze[ghost_pos.x][ghost_pos.y+1] != W) {
+        ghost->possibles[3] = true; 
+    }
+    if(maze[ghost_pos.x][ghost_pos.y-1] != W) {
+        ghost->possibles[1] = true; 
+    }
+    Ghost::send_pac_cord(pacman->x(),pacman->y());
 
 }
 

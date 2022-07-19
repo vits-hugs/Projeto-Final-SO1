@@ -118,7 +118,7 @@ private:
             sem->p();
             //Thread::yield();
             pacman->run();
-            std::cout << "X: " << pacman->x() << " Y: " << pacman->y() << "\n";
+            //std::cout << "X: " << pacman->x() << " Y: " << pacman->y() << "\n";
             sem->v();
         }
         pacman_thread->thread_exit(4);        
@@ -129,7 +129,7 @@ private:
         std::cout << name << ": inicio\n";
         while(window->isOpen()) { 
         sem->p();
-        std::cout << name << "\n" ;
+        //std::cout << name << "\n" ;
         ghost_array[id]->run();
             //Thread::yield();
         sem->v();
@@ -145,8 +145,8 @@ private:
 
         window_logic->run();
         //Thread::yield();
-        std::cout << "TAM_X: "<<window_logic->test_x << "\nTAM_Y: "
-        << window_logic->test_y << "\n";
+        //std::cout << "TAM_X: "<<window_logic->test_x << "\nTAM_Y: "
+        //<< window_logic->test_y << "\n";
         sem->v();
         }
         window_thread->thread_exit(2);

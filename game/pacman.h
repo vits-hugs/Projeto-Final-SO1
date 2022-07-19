@@ -1,6 +1,8 @@
 #ifndef pacman_h
 #define pacman_h
+
 #include "agent.h"
+
 #define INIT_POS_X 220
 #define INIT_POS_Y 220
 #define PAC_SPEED 5
@@ -8,7 +10,7 @@ class Pacman : public Agent
 {
 public:
     Pacman();
-    typedef enum {LEFT,UP,RIGHT,DOWN} direction;
+    
     const int get_direction(){return direct;}
     void set_direction(direction dir){direct = dir;}
 

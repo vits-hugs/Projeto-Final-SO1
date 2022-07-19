@@ -4,6 +4,7 @@ class Agent {
 
     public:
         virtual void run()=0;
+        typedef enum {LEFT,UP,RIGHT,DOWN} direction;
         void return_to_old_pos(){_x=_old_x;_y=_old_y;}
         void set_old_pos(){_old_x=_x;_old_y=_y;}
         const float x(){return _x;}
