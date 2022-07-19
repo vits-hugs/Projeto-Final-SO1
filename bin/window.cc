@@ -228,7 +228,7 @@ void Window::draw_ghost(int ghost_id) {
     }
 
     inform_ghost(ghost);
-    //agent_collision(ghost);
+    agent_collision(ghost);
 }
 
 void Window::draw_all_ghosts() {
@@ -266,6 +266,7 @@ void Window::inform_ghost(Ghost *ghost) {
         draw_sprite(ghost_y_0_sprite,ghost->x()+16,ghost->y());
     }
     }
+    
     Ghost::send_pac_cord(pacman->x(),pacman->y());
 }
 
