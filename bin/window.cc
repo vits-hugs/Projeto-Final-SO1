@@ -83,8 +83,6 @@ void Window::run(sf::Clock& clock)
     
     //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
     //https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php
- 
-    std::cout << "Window RUN \n";
     window->clear();
     window->draw(maze_sprite);
     draw_objects_on_maze();
@@ -92,6 +90,7 @@ void Window::run(sf::Clock& clock)
     draw_pacman();
     draw_all_ghosts();
     draw_score();
+    maybe_cherry();
     window->display();
 
     counter = (int)clock.getElapsedTime().asMilliseconds();
@@ -188,12 +187,33 @@ void Window::pacman_collision() {
         verify_win();
         pacman->go_power(counter);
         break;
+    case C:
+        std::cout << "bati Numa cereja\n";
+        maze[agent_maze.x][agent_maze.y] = e;
+        increase_score("100");
+        break;
     case P:
         pacman->teleport();
         break;  
     default:
         break;
     }
+}
+
+void Window::maybe_cherry() {
+    const int cherry_y = 300;
+    if((counter/1000)%10==9 && maze[(int)230/16][(int)cherry_y/16]!=C) {
+        maze[(int)230/16][(int)cherry_y/16+1] = C;
+        time_cherry_spawn = counter;
+    }
+    if((counter-time_cherry_spawn)/1000 > 5)
+    {
+        maze[(int)230/16][(int)cherry_y/16+1] = e;
+    }
+    if(maze[(int)230/16][(int)cherry_y/16+1]==C){
+        draw_sprite(cherry_sprite,210,cherry_y);
+    }
+
 }
 
 void Window::agent_collision(Agent* agent) {

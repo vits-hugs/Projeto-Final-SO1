@@ -29,9 +29,10 @@ public:
  *      e: Eaten Pill
  *      O: Big Pill
  *      E: Eaten Big Pill
+ *      C: Cherry
  */
 
-    typedef enum {W, G, P, u, o, e, O, E, F} tile;
+    typedef enum {W, G, P, u, o, e, O, E, F,C} tile;
     static tile maze[28][31];
     float test_x,test_y;
 private:
@@ -48,14 +49,17 @@ private:
     void draw_object(sf::Sprite& sprite, int x, int y);
     void load_and_bind_textures();
     void center_sprite_origin(sf::Sprite& sprite);
+    void increase_score(const char* points);
+    void maybe_cherry();
 
     //GHOSTS
     void draw_all_ghosts();
     void draw_score();
-    void increase_score(const char* points);
     void draw_ghost(int ghost_id);
     void inform_ghost(Ghost* ghost);
 private:
+    int time_cherry_spawn;
+    int cherry_duration;
     int counter;
     int score{0};
     unsigned int pill_counter;
