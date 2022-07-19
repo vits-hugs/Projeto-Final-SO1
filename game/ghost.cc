@@ -1,6 +1,6 @@
 #define GHOST_START_X 220
 #define GHOST_START_Y 250
-
+#define GHOST_SPEED 1;
 #include"ghost.h"
 #include<iostream>
 int Ghost::pac_x=220;
@@ -16,13 +16,19 @@ Ghost::Ghost(int id) {
     _x = GHOST_START_X;
     _y = GHOST_START_Y;
     _id = id;
+    speed = GHOST_SPEED;
 }
 
 void Ghost::center_me(int x,int y) {
-    //_x = (x*16) - 1;
-    //_y = y*16 + 8;
-
+   
+    if (direct%2) {
+        _x = x*16;
+    } else {
+        _y = y*16;
+    }
 }
+
+
 
 void Ghost::run() {
     Ghost_think();
@@ -61,19 +67,19 @@ void Ghost::Ghost_think() {
             d=i;
         }
     }
-    
-    if(possibles[0]){
+    int dist_x = pac_x - x();
+    int dist_y = pac_y - y();
+    if(possibles[0] && direct!=RIGHT){
         set_direction(LEFT);
-        std::cout << "VOU PRA DIREITA";
     }
-    if(possibles[1]){
+    if(possibles[1]&& direct!=DOWN){
         set_direction(UP);
     }
-    if(possibles[2]){
-        set_direction(RIGHT);
+    if(possibles[2] && direct!=LEFT){
+       /*if(possibles[0] && pac_x > 0)*/ set_direction(RIGHT);
     }
-    if(possibles[3]) {
-        set_direction(DOWN);
+    if(possibles[3] && direct!=UP) {
+       /* if(possibles[0] && pac_y > 0)*/ set_direction(DOWN);
     }
     
     if (id()==0) {

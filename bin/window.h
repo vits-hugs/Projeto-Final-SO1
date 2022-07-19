@@ -38,6 +38,7 @@ public:
 private:
     bool verify_colision_with_tile(tile tile);
     void agent_collision(Agent* agent);
+    sf::Vector2i get_pos_matriz_m(Agent* agent);
     sf::Vector2i get_pos_matriz(Agent* agent);
     void draw_sprite(sf::Sprite& sprite, int length, int height);
     void draw_sprite_and_rotate(sf::Sprite& sprite, int length, int height, float angle);

@@ -76,7 +76,7 @@ void Window::run()
     window->clear();
     window->draw(maze_sprite);
     draw_objects_on_maze();
-    //draw_board_testing();
+    draw_board_testing();
     draw_pacman();
     draw_all_ghosts();
     ghost_p_0_sprite.setPosition(245, 150);
@@ -87,7 +87,7 @@ void Window::run()
 }
 
 void Window::draw_sprite(sf::Sprite& sprite, int x, int y) {
-    center_sprite_origin(sprite);
+    //center_sprite_origin(sprite);
     sprite.setPosition(x,y);
     window->draw(sprite);
 }
@@ -144,6 +144,10 @@ sf::Vector2i Window::get_pos_matriz(Agent* agent) {
     return sf::Vector2i((int)agent->x()/16,(int)agent->y()/16);
 }
 
+sf::Vector2i Window::get_pos_matriz_m(Agent* agent) {
+    return sf::Vector2i((int)(agent->x()-3)/16,(int)(agent->y()+3)/16);
+}
+
 void Window::agent_collision(Agent* agent) {
     sf::Vector2i agent_maze = get_pos_matriz(agent);
     switch (maze[agent_maze.x][agent_maze.y])
@@ -198,8 +202,8 @@ void Window::draw_board_testing() {
         for (int y = 0; y < 31; y++)
         {
             if(maze[x][y]==W){
-            ghost_r_0_sprite.setPosition(x*16,y*16);
-            window->draw(ghost_r_0_sprite);
+            ghost_p_0_sprite.setPosition(x*16,y*16);
+            window->draw(ghost_p_0_sprite);
             }
         }
         
@@ -212,9 +216,6 @@ void Window::draw_board_testing() {
 
 void Window::draw_ghost(int ghost_id) {
     auto ghost = ghost_array[ghost_id];
-    center_sprite_origin(ghost_r_0_sprite);
-    center_sprite_origin(ghost_r_1_sprite);
-    std::cout << ghost;
     switch (ghost_id)
     {
     case 1:
@@ -227,7 +228,7 @@ void Window::draw_ghost(int ghost_id) {
     }
 
     inform_ghost(ghost);
-    agent_collision(ghost);
+    //agent_collision(ghost);
 }
 
 void Window::draw_all_ghosts() {
@@ -241,25 +242,31 @@ void Window::draw_all_ghosts() {
 }
 
 void Window::inform_ghost(Ghost *ghost) {
-    //ghost->center_me(ghost_pos.x,ghost_pos.y);
     sf::Vector2i ghost_pos = get_pos_matriz(ghost);
+    ghost->center_me(ghost_pos.x,ghost_pos.y);
+    if (ghost_pos.x!=ghost->tile_old_x() || ghost_pos.y!=ghost->tile_old_y()){
+    ghost->set_tile_old(ghost_pos.x,ghost_pos.y);
     for(bool& x:ghost->possibles) {
         x = false;
     }
-    if(maze[ghost_pos.x+1][ghost_pos.y] != W){
-        ghost->possibles[2] = true;
-    }
-    if(maze[ghost_pos.x-1][ghost_pos.y] != W){
+    if(maze[ghost_pos.x-1][ghost_pos.y] != W  && (ghost->get_direction()!=Agent::RIGHT)){
         ghost->possibles[0] = true; 
-    }
-    if(maze[ghost_pos.x][ghost_pos.y+1] != W) {
+        draw_sprite(ghost_y_0_sprite,ghost->x()-16,ghost->y());
+    } 
+    if(maze[ghost_pos.x][ghost_pos.y+1] != W && (ghost->get_direction()!=Agent::UP)) {
         ghost->possibles[3] = true; 
+        draw_sprite(ghost_y_0_sprite,ghost->x(),ghost->y()+16);
     }
-    if(maze[ghost_pos.x][ghost_pos.y-1] != W) {
+    if(maze[ghost_pos.x][ghost_pos.y-1] != W && (ghost->get_direction()!=Agent::DOWN)) {
         ghost->possibles[1] = true; 
+        draw_sprite(ghost_y_0_sprite,ghost->x(),ghost->y()-16);
+    }
+    if(maze[ghost_pos.x+1][ghost_pos.y] != W && (ghost->get_direction()!=Agent::LEFT)){
+        ghost->possibles[2] = true;
+        draw_sprite(ghost_y_0_sprite,ghost->x()+16,ghost->y());
+    }
     }
     Ghost::send_pac_cord(pacman->x(),pacman->y());
-
 }
 
 

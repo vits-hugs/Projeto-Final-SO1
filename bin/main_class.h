@@ -11,7 +11,7 @@
 #include "../game/pacman.h"
 #include "../game/ghost.h"
 #include "../game/agent.h"
-#define FPS 30
+#define FPS 20
 __BEGIN_API
 
 class Main
