@@ -1,18 +1,24 @@
 #ifndef window_h
 #define window_h
-
 #include <iostream>
 #include <png.h>
 #include <SFML/Graphics.hpp>
-
+#include "../game/pacman.h"
+#include "../game/ghost.h"
 class Window
 {
 public:
-    Window();
+    Window(sf::RenderWindow* window,Pacman* pacman,Ghost* ghost_array[]);
 
-    void run();
+    void run(sf::Clock& clock);
 
     void draw_texture(unsigned int texture, int length, int height, float angle);
+
+    void draw_pacman();
+
+    void draw_board_testing();
+    
+
     /**
  * Tile defined as an enum where each type is defined as:
  *      W: Wall
@@ -23,17 +29,47 @@ public:
  *      e: Eaten Pill
  *      O: Big Pill
  *      E: Eaten Big Pill
+ *      C: Cherry
  */
 
-    typedef enum {W, G, P, u, o, e, O, E, F} tile;
+    typedef enum {W, G, P, u, o, e, O, E, F,C} tile;
     static tile maze[28][31];
-
+    float test_x,test_y;
 private:
+    void verify_win();
+    void lose();
+    bool verify_colision_with_tile(tile tile);
+    void agent_collision(Agent* agent);
+    void pacman_collision();
+    sf::Vector2i get_pos_matriz_m(Agent* agent);
+    sf::Vector2i get_pos_matriz(Agent* agent);
+    void draw_sprite(sf::Sprite& sprite, int length, int height);
+    void draw_sprite_and_rotate(sf::Sprite& sprite, int length, int height, float angle);
+    void draw_objects_on_maze(); 
+    void draw_object(sf::Sprite& sprite, int x, int y);
     void load_and_bind_textures();
+    void center_sprite_origin(sf::Sprite& sprite);
+    void increase_score(const char* points);
+    void maybe_cherry();
 
-
+    //GHOSTS
+    void draw_all_ghosts();
+    void draw_score();
+    void draw_ghost(int ghost_id);
+    void inform_ghost(Ghost* ghost);
 private:
-
+    int time_cherry_spawn;
+    int cherry_duration;
+    int counter;
+    int score{0};
+    unsigned int pill_counter;
+    sf::RenderWindow *window;
+    Pacman *pacman;
+    Ghost *ghost_array[4];
+    sf::Sprite pacman_sprites[3];
+    sf::Sprite number_sprites[10];
+    int num[8];
+    //Ghost * ghost;
     // Maze Textures
     sf::Texture maze_tex;
     sf::Sprite maze_sprite;

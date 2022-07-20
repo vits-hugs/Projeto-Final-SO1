@@ -31,6 +31,7 @@ int Thread::switch_context(Thread * prev, Thread * next){
         }
         //_running = next;
         //next->_state = RUNNING;
+         db<Thread>(TRC) << "prev: " << prev->id() << " next: " << next->id() << "\n";
         CPU::switch_context(prev->context(),next->context());
         db<Thread>(TRC) << "volta\n";
    
@@ -117,10 +118,11 @@ void Thread::init(void (*main)(void *)){
 
 
 void Thread::yield(){
-    db<Thread>(TRC) <<  "chamando yield\n";
     
     Thread * prev = running();
     Thread * next = _ready.remove()->object();;
+    db<Thread>(TRC) <<  "Thread: "<< prev->id() << " chamando yield\n";
+    db<Thread>(TRC) <<  "Próximo: "<< next->id() << "\n";
     // não deveria precisar if (!_ready.empty()) {next= }
     
   
@@ -133,12 +135,12 @@ void Thread::yield(){
         
     }
     if (prev->_id > 0 && prev->_state != FINISHING) {
-        db<Thread>(TRC) << "Thread: " << prev->id() << "insert();\n";
+        db<Thread>(TRC) << "Thread: " << prev->id() << " insert();\n";
         _ready.insert(&prev->_link);
     }
     db<Semaphore>(TRC) << "rodando: " << prev->_state << "\n";
     _running = next;
-
+    db<Thread>(TRC) << "Y> thread next:" << next->id() << "\n";
     next->_state = RUNNING;
 
     switch_context(prev,next);
@@ -151,7 +153,7 @@ void Thread::suspend() {
     if (this != &_main){
         _ready.remove(&this->_link);
     }
-    db<Thread>(TRC) << "Thread: " << this->id() << "suspendo;\n";
+    db<Thread>(TRC) << "Thread: " << this->id() << "suspendendo;\n";
     _suspend.insert(&this->_link);
     if (_running == this){
         yield();
@@ -159,7 +161,9 @@ void Thread::suspend() {
 }
 
 int Thread::join() {
-    db<Thread>(TRC) << "Thread: " << this->_id << " chamou join\n";
+    db<Thread>(TRC) << "Thread: " << this->_id << " chamou join "
+    << "suspendendo " << _running->id();
+
     if (this->_state != FINISHING){
         _running->suspend();
     }

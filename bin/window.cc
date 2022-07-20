@@ -1,5 +1,6 @@
 #include "window.h"
-
+#define PILL_NUMBER 244
+#define FPS 20
 Window::tile Window::maze[28][31] =
         {
                 {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W},
@@ -29,9 +30,10 @@ Window::tile Window::maze[28][31] =
                 {W,o,W,W,o,o,o,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
                 {W,o,W,W,o,W,W,o,W,W,o,W,u,u,u,W,u,W,u,u,u,W,o,W,W,o,W,W,W,o,W},
                 {W,o,o,o,o,W,W,O,o,o,o,W,u,u,u,W,u,W,u,u,u,W,o,o,o,o,O,o,o,o,W},
-                {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W}
+                {W,W,W,W,W,W,W,W,W,W,W,W,u,u,u,W,P,W,u,u,u,W,W,W,W,W,W,W,W,W,W}    
         };
 
+            
 
 /**
  * Tile defined as an enum where each type is defined as:
@@ -50,66 +52,385 @@ Window::tile Window::maze[28][31] =
 // 2D array defines the size of the maze and also what each tile contains
 
 
-Window::Window()
+Window::Window(sf::RenderWindow* window,Pacman* pacman,Ghost* ghost_array[])
 {
+    this->pacman = pacman; 
+    this->window = window;
+    pill_counter = PILL_NUMBER;
+  
+    for (size_t i = 0; i < 4; i++)
+    {
+        this->ghost_array[i] = ghost_array[i];
+    }
+    
     load_and_bind_textures();
+    sf::Sprite pacman_sprites[3]={pac_0_sprite,pac_1_sprite,pac_2_sprite};
+    number_sprites[0] = num_0_sprite;
+    number_sprites[1] = num_1_sprite;
+    number_sprites[2] = num_2_sprite;
+    number_sprites[3] = num_3_sprite;
+    number_sprites[4] = num_4_sprite;
+    number_sprites[5] = num_5_sprite;
+    number_sprites[6] = num_6_sprite;
+    number_sprites[7] = num_7_sprite;
+    number_sprites[8] = num_8_sprite;
+    number_sprites[9] = num_9_sprite;
 }
 
-void Window::draw_texture(unsigned int texture, int length, int height, float angle)
+void Window::run(sf::Clock& clock)
 {
-}
-
-void Window::run()
-{
-    sf::RenderWindow window(sf::VideoMode(500, 500), "SFML works!");
-
+    
     //Link: https://www.sfml-dev.org/tutorials/2.5/window-events.php
     //https://www.sfml-dev.org/documentation/2.5.1/classsf_1_1Keyboard.php
-    window.setKeyRepeatEnabled(false);
+    window->clear();
+    window->draw(maze_sprite);
+    draw_objects_on_maze();
+    //draw_board_testing();
+    draw_pacman();
+    draw_all_ghosts();
+    draw_score();
+    maybe_cherry();
+    window->display();
 
-    while (window.isOpen())
+    counter = (int)clock.getElapsedTime().asMilliseconds();
+}
+
+void Window::draw_sprite(sf::Sprite& sprite, int x, int y) {
+    //center_sprite_origin(sprite);
+    sprite.setPosition(x,y);
+    window->draw(sprite);
+}
+
+void Window::draw_sprite_and_rotate(sf::Sprite& sprite, int x, int y, float angle)
+{
+    center_sprite_origin(sprite);
+    sprite.setRotation(angle);
+    draw_sprite(sprite,x,y);
+}
+
+
+void Window::center_sprite_origin(sf::Sprite& sprite) {
+    sf::FloatRect rect= sprite.getLocalBounds();
+    sprite.setOrigin(sf::Vector2f(rect.width/2,rect.height/2));
+    test_x = rect.width;
+    test_y = rect.height;
+}
+
+void Window::draw_pacman() {
+    pacman_collision();
+    switch (counter%3)
     {
-        sf::Event event;
-        while (window.pollEvent(event))
-        {
-            switch (event.type) {
-            case sf::Event::Closed:
-                 window.close();
-                 break;
-            
-            // key pressed
-            case sf::Event::KeyPressed:
-                if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-                    std::cout << "Keyboard esquerda!" << std::endl;
-                } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-                    std::cout << "Keyboard direita!" << std::endl;
-                } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-                    std::cout << "Keyboard para baixo!" << std::endl;
-                } else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-                    std::cout << "Keyboard para cima!" << std::endl;
-                } else
-                    std::cout << "Keyboard pressed = " << event.key.code << std::endl;
-                break;
-            
+    case 0:
+        draw_sprite_and_rotate(pac_0_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
+        break;
+    case 1:
+        draw_sprite_and_rotate(pac_1_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
+        break;
+    case 2:
+        draw_sprite_and_rotate(pac_2_sprite,pacman->x(),pacman->y(),pacman->get_direction()*90);
+        break;
+    
+    default:
+        break;
+    }
+    //if (verify_colision_with_tile(W)) {
+    // 
+    //    pacman->return_old_pos();
+    //    ghost_scared_0_sprite.setPosition(pacman->x(),pacman->y());
+    //     window->draw(ghost_scared_0_sprite);
+    //}
+    //agent_collision(pacman);
+}
+
+
+bool Window::verify_colision_with_tile(Window::tile tile) {
+    int pacman_x = (int)pacman->x();
+    int pacman_y = (int)pacman->y();
+    return maze[pacman_x/16][pacman_y/16] == tile;
+}
+
+sf::Vector2i Window::get_pos_matriz(Agent* agent) {
+    return sf::Vector2i((int)agent->x()/16,(int)agent->y()/16);
+}
+
+void Window::pacman_collision() {
+    pacman->verify_super(counter);
+    sf::Vector2i agent_maze = get_pos_matriz(pacman);
+    for(auto ghost:ghost_array){
+
+        if(agent_maze.x==ghost->tile_old_x() && agent_maze.y==ghost->tile_old_y()) {
+            if(pacman->is_super()) {
+                ghost->kill(counter,rand()%7+1);
+                increase_score("200");
+            } else {
+            if (!pacman->damage(counter,FPS)) lose();
             }
         }
 
-        window.clear();
-        window.draw(maze_sprite);
-        pac_0_sprite.setPosition(220, 365);
-        window.draw(pac_0_sprite);
-        ghost_p_0_sprite.setPosition(245, 150);
-        window.draw(ghost_p_0_sprite);
-        window.display();
+    }
+    switch (maze[agent_maze.x][agent_maze.y])
+    {
+    case W:
+        pacman->return_to_old_pos();     
+        break;   
+    case o:
+        maze[agent_maze.x][agent_maze.y] = e;
+        pill_counter--;
+        increase_score("10");
+        verify_win();
+        break;
+    case O:
+        maze[agent_maze.x][agent_maze.y] = E;
+        pill_counter--;
+        increase_score("10");
+        verify_win();
+        pacman->go_power(counter);
+        break;
+    case C:
+        maze[agent_maze.x][agent_maze.y] = e;
+        increase_score("100");
+        break;
+    case P:
+        pacman->teleport();
+        break;  
+    default:
+        break;
+    }
+}
+
+void Window::maybe_cherry() {
+    const int cherry_y = 300;
+    if((counter/1000)%10==9 && maze[(int)230/16][(int)cherry_y/16]!=C) {
+        maze[(int)230/16][(int)cherry_y/16+1] = C;
+        time_cherry_spawn = counter;
+    }
+    if((counter-time_cherry_spawn)/1000 > 5)
+    {
+        maze[(int)230/16][(int)cherry_y/16+1] = e;
+    }
+    if(maze[(int)230/16][(int)cherry_y/16+1]==C){
+        draw_sprite(cherry_sprite,210,cherry_y);
+    }
+
+}
+
+void Window::agent_collision(Agent* agent) {
+    sf::Vector2i agent_maze = get_pos_matriz(agent);
+    switch (maze[agent_maze.x][agent_maze.y])
+    {
+    case W:
+        agent->return_to_old_pos();     
+        break;   
+    case P:
+        agent->teleport();
+        //maze[agent_maze.x][agent_maze.y] = e;
+        break;
+    }
+
+}
+void Window::draw_object(sf::Sprite& sprite,int x,int y) {
+        sprite.setPosition(x*16,y*16);
+        window->draw(sprite);
+}
+
+
+void Window::draw_objects_on_maze() {
+    for (int x = 0; x < 28; x++)
+    {
+        for (int y = 0; y < 31; y++)
+        {
+           switch (maze[x][y])
+           {
+            case o:
+                draw_object(pill_sprite,x,y);
+                break;
+            case O:
+                draw_object(bigPill_sprite,x,y);
+                break;
+           default:
+            break;
+           }
+        }
+    }
+        
+}
+
+void Window::draw_board_testing() {
+    
+    for (int x = 0; x < 28; x++)
+    {
+        for (int y = 0; y < 31; y++)
+        {
+            if(maze[x][y]==W){
+            ghost_p_0_sprite.setPosition(x*16,y*16);
+            window->draw(ghost_p_0_sprite);
+            }
+        }
+        
+    }
+    
+
+
+}
+//GHOSTS
+
+void Window::draw_ghost(int ghost_id) {
+    auto ghost = ghost_array[ghost_id];
+    ghost->try_ressurection(counter);
+    if(pacman->is_super()){
+        switch (counter%3)
+        {
+        case 0:
+            draw_sprite(ghost_scared_0_sprite,ghost->x(),ghost->y());
+            break;
+        case 1:
+            draw_sprite(ghost_scared_1_sprite,ghost->x(),ghost->y());
+            break;
+        case 2:
+            draw_sprite(ghost_scared_2_sprite,ghost->x(),ghost->y());
+            break;
+        default:
+            break;
+        }
+    
+    } else {
+        switch (ghost_id)
+        {
+        case 0:
+            if (counter%2==0) {draw_sprite(ghost_r_0_sprite,ghost->x(),ghost->y());}
+            else {draw_sprite(ghost_r_1_sprite,ghost->x(),ghost->y());}
+            break;
+
+        case 1:
+            if (counter%2==0) {draw_sprite(ghost_p_0_sprite,ghost->x(),ghost->y());}
+            else {draw_sprite(ghost_p_1_sprite,ghost->x(),ghost->y());}
+            break;
+        case 2:
+            if (counter%2==0) {draw_sprite(ghost_y_0_sprite,ghost->x(),ghost->y());}
+            else {draw_sprite(ghost_y_1_sprite,ghost->x(),ghost->y());}
+            break;
+        case 3:
+            if (counter%2==0) {draw_sprite(ghost_b_0_sprite,ghost->x(),ghost->y());}
+            else {draw_sprite(ghost_b_1_sprite,ghost->x(),ghost->y());}
+            break;
+        default:
+            break;
+        }
+    }
+    inform_ghost(ghost);
+    agent_collision(ghost);
+}
+
+void Window::draw_all_ghosts() {
+    for (int i = 0; i < 4; i++)
+    {
+        draw_ghost(i);
+    }
+
+
+
+}
+
+void Window::inform_ghost(Ghost *ghost) {
+    sf::Vector2i ghost_pos = get_pos_matriz(ghost);
+    ghost->center_me(ghost_pos.x,ghost_pos.y);
+    if (ghost_pos.x!=ghost->tile_old_x() || ghost_pos.y!=ghost->tile_old_y()){
+    ghost->set_tile_old(ghost_pos.x,ghost_pos.y);
+    for(bool& x:ghost->possibles) {
+        x = false;
+    }
+    if(maze[ghost_pos.x-1][ghost_pos.y] != W  && (ghost->get_direction()!=Agent::RIGHT)){
+        ghost->possibles[0] = true; 
+    } 
+    if(maze[ghost_pos.x][ghost_pos.y+1] != W && (ghost->get_direction()!=Agent::UP)) {
+        ghost->possibles[3] = true; 
+        
+    }
+    if(maze[ghost_pos.x][ghost_pos.y-1] != W && (ghost->get_direction()!=Agent::DOWN)) {
+        ghost->possibles[1] = true; 
+        
+    }
+    if(maze[ghost_pos.x+1][ghost_pos.y] != W && (ghost->get_direction()!=Agent::LEFT)){
+        ghost->possibles[2] = true;
+        
+    }
+    }
+    
+    Ghost::send_pac_cord(pacman->x(),pacman->y());
+}
+
+void Window::verify_win() {
+    if(!pill_counter) {
+        std::cout << "WIN\n";
+        draw_sprite(score_1600_sprite,window->getSize().x/2-5,window->getSize().y/2);
+        window->display();
+        sf::Event event;
+        while(window->waitEvent(event)) {
+            if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) {
+                break;
+            }
+        }
+    }
+
+}
+
+void Window::lose() {
+    std::cout << "LOSE\n";
+    draw_sprite(gameover_sprite, window->getSize().x/2-65, window->getSize().y/2);
+    window->display();
+    sf::Event event;
+    while(window->waitEvent(event)) {
+        if(event.type == sf::Event::Closed) window->close();
+        if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::R) break;
+                
+     
+    }
+    
+
+}
+
+void Window::draw_score() {
+    draw_sprite(score_sprite,0,0);
+    for (int i = 0; i < 8; i++)
+    {
+        draw_sprite(number_sprites[num[7-i]],48+i*16,0);
+    }
+    
+
+}
+
+void Window::increase_score(const char* points) {
+    int index = -2;
+    for (size_t i = 0; i < 5; i++)
+    {
+        index++;
+        if(points[i]=='\0'){
+            break;
+        }
+    }
+    int soma = num[index]+points[0]-'0';
+    
+    while (soma>=10) {
+        num[index]=soma-9;
+        index++;
+        soma = num[index]+1;
+    }
+    if(soma<10) {
+        num[index]=soma;
     }
 }
 
 void Window::load_and_bind_textures()
 {
+    unsigned int counter{0};
+    sf::RenderWindow* window;
     // Bind map textures    
     maze_tex.loadFromFile("sprites/maze/maze.png");
     maze_sprite.setTexture(maze_tex);
-    maze_sprite.scale(2, 2);
+    center_sprite_origin(maze_sprite);
+    maze_sprite.scale(2,-2);
+    maze_sprite.setPosition(16*14,16*15.5);//REFATORAR
+    //maze_sprite.setRotation(180);
     pill_tex.loadFromFile("sprites/maze/p-0.png");
     pill_sprite.setTexture(pill_tex);
     bigPill_tex.loadFromFile("sprites/maze/p-1.png");
